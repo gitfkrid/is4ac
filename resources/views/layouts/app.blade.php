@@ -21,6 +21,8 @@
     <link href="{{ asset('public/assets/css/sb-admin-2.min.css') }}" rel="stylesheet">
 
     <!-- Custom styles for this page -->
+    <script src="{{ asset('public/assets/js/jquery-3.7.0.js') }}"></script>
+    <script src="{{ asset('public/assets/js/toastr.min.js') }}" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <link href="{{ asset('public/assets/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('public/assets/css/toastr.min.css') }}" integrity="sha512-vKMx8UnXk60zUwyUnUPM3HbQo8QfmNx7+ltw8Pm5zLusl1XIfwcxo8DbWCqMGKaWeNxWA8yrx5v3SaVpMvR3CA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
@@ -45,14 +47,14 @@
             <!-- Nav Item - Dashboard -->
             <li class="nav-item">
                 <a class="nav-link" href="#">
-                    <i class="fa fa-home" aria-hidden="true"></i>
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard</span>
                 </a>
             </li>
             <!-- Nav Item - Pengguna -->
             <li class="nav-item">
                 <a class="nav-link" href="#">
-                    <i class="fa fa-user" aria-hidden="true"></i>
+                    <i class="fas fa-fw fa-cog"></i>
                     <span>Pengguna</span>
                 </a>
             </li>
@@ -77,11 +79,9 @@
                 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
 
                     <!-- Sidebar Toggle (Topbar) -->
-                    <form class="form-inline">
-                        <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-                            <i class="fa fa-bars"></i>
-                        </button>
-                    </form>
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
 
                     <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">
@@ -111,6 +111,7 @@
 
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
+                    @yield('headcontent')
 
                     <div class="card shadow mb-4">
                         @yield('content')
@@ -170,9 +171,7 @@
     <!-- Bootstrap core JavaScript-->
     <script src="{{ asset('public/assets/vendor/jquery/jquery.min.js') }}"></script>
     <script src="{{ asset('public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ asset('public/assets/js/jquery-3.7.0.js') }}"></script>
-    <script src="{{ asset('public/assets/js/toastr.min.js') }}" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
+`
     <!-- Core plugin JavaScript-->
     <script src="{{ asset('public/assets/vendor/jquery-easing/jquery.easing.min.js') }}"></script>
 
