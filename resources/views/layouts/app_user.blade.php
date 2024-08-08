@@ -51,13 +51,6 @@
                     <span>Dashboard</span>
                 </a>
             </li>
-            <!-- Nav Item - Pengguna -->
-            <li class="nav-item">
-                <a class="nav-link" href="{{ route('pengguna.index') }}">
-                    <i class="fas fa-fw fa-cog"></i>
-                    <span>Pengguna</span>
-                </a>
-            </li>
 
             <!-- Divider -->
             <hr class="sidebar-divider">
