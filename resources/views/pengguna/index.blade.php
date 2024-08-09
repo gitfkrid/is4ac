@@ -53,10 +53,19 @@
                         data : $('#modal-form form').serialize(),
                         success : function(data){
                             $('#modal-form').modal('hide');
+                            Swal.fire(
+                                'Berhasil!',
+                                'Pengguna berhasil ditambahkan!',
+                                'success'
+                            )
                             table.ajax.reload();
                         },
                         error : function(){
-                            alert("Tidak dapat menyimpan data!");
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Tidak dapat menyimpan data!',
+                            })
                         }
                     });
                     return false;
