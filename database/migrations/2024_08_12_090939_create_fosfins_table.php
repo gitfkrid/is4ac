@@ -11,9 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('level', function (Blueprint $table) {
-            $table->id('id_level');
-            $table->string('nama_level', 50);
+        Schema::create('fosfin', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('id_alat');
+            $table->foreign('id_alat')->references('id_alat')->on('alat')->onDelete('cascade');
+            $table->decimal('fosfin', 21, 16);
+            $table->timestamps();
         });
     }
 
@@ -22,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('level');
+        Schema::dropIfExists('fosfin');
     }
 };

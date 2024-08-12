@@ -33,7 +33,7 @@
         <!-- Sidebar -->
         <ul class="navbar-nav sidebar sidebar-dark accordion" id="accordionSidebar" style="background-color: #212429">
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{route('dashboard')}}">
                 <div class="sidebar-brand-icon">
                     <img src="{{ asset('public/assets/img/mdr-login-logo.png') }}" alt="Logo" width="25" height="25">
                 </div>
@@ -85,6 +85,9 @@
 
                     <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">
+                        <div class="d-flex justify-content-end align-items-center">
+                            <h3 id="time" class="pt-2 h3 ml-2 text-gray-800"></h3>
+                        </div>
                         <div class="topbar-divider d-none d-sm-block"></div>
 
                         <!-- Nav Item - User Information -->
@@ -112,12 +115,7 @@
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
                     @yield('headcontent')
-
-                    @yield('dashboard')
-                    <div class="card shadow mb-4">
-                        @yield('content')
-                    </div>
-
+                    @yield('content')
                 </div>
                 <!-- /.container-fluid -->
 
@@ -172,7 +170,7 @@
     <!-- Bootstrap core JavaScript-->
     <script src="{{ asset('public/assets/vendor/jquery/jquery.min.js') }}"></script>
     <script src="{{ asset('public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-`
+
     <!-- Core plugin JavaScript-->
     <script src="{{ asset('public/assets/vendor/jquery-easing/jquery.easing.min.js') }}"></script>
 
