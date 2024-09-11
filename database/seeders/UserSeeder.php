@@ -31,6 +31,15 @@ class UserSeeder extends Seeder
                 'password' => bcrypt('ugQ5TC.JAwyEx'),
                 'created_at' => now(),
                 'updated_at' => now(),
+            ],
+            [
+                'name' => 'Thoriq Lukman Hakim',
+                'email' => 'thor@gmail.com',
+                'email_verified_at' => now(),
+                'id_level' => '2',
+                'password' => bcrypt('123456'),
+                'created_at' => now(),
+                'updated_at' => now(),
             ]
         ));
     }

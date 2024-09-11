@@ -53,9 +53,16 @@
             </li>
             <!-- Nav Item - Pengguna -->
             <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="{{ route('pengguna.index') }}">
                     <i class="fas fa-fw fa-cog"></i>
                     <span>Pengguna</span>
+                </a>
+            </li>
+            <!-- Nav Item - Lokasi -->
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('userLokasi.index') }}">
+                    <i class="fas fa-fw fa-cog"></i>
+                    <span>Lokasi Pengguna</span>
                 </a>
             </li>
 
@@ -85,6 +92,9 @@
 
                     <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">
+                        <div class="d-flex justify-content-end align-items-center">
+                            <h3 id="time" class="pt-2 h3 ml-2 text-gray-800"></h3>
+                        </div>
                         <div class="topbar-divider d-none d-sm-block"></div>
 
                         <!-- Nav Item - User Information -->
@@ -172,7 +182,7 @@
     <!-- Bootstrap core JavaScript-->
     <script src="{{ asset('public/assets/vendor/jquery/jquery.min.js') }}"></script>
     <script src="{{ asset('public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-`
+
     <!-- Core plugin JavaScript-->
     <script src="{{ asset('public/assets/vendor/jquery-easing/jquery.easing.min.js') }}"></script>
 
@@ -186,6 +196,19 @@
     <!-- Page level custom scripts -->
     <script src="{{ asset('public/assets/js/demo/datatables-demo.js') }}"></script>
     <script src="{{ asset('public/assets/vendor/sweetalert/sweetalert.js') }}"></script>
+
+    <script>
+        function updateTime() {
+            var now = new Date();
+            var hours = String(now.getHours()).padStart(2, '0');
+            var minutes = String(now.getMinutes()).padStart(2, '0');
+            var seconds = String(now.getSeconds()).padStart(2, '0');
+            var currentTime = hours + ':' + minutes + ':' + seconds;
+            document.getElementById('time').innerText = currentTime;
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+    </script>
     @yield('script')
 </body>
 

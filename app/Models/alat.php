@@ -15,9 +15,10 @@ class alat extends Model
     protected $primaryKey = 'id_alat';
 
     protected $fillable = [
+        'kode_board',
         'nama_device',
-        'jenis_alat',
-        'topic_mqtt',
+        'id_jenis_alat',
+        'id_lokasi',
         'status',
     ];
 
@@ -28,6 +29,10 @@ class alat extends Model
 
     public function jenis_alat() {
         return $this->belongsTo('App\Models\jenis_alat', 'id_jenis_alat');
+    }
+
+    public function lokasi() {
+        return $this->belongsTo('App\Models\lokasi', 'id_lokasi');
     }
 
     protected static function boot()

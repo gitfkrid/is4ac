@@ -14,9 +14,8 @@ return new class extends Migration
         Schema::create('alat', function (Blueprint $table) {
             $table->id('id_alat');
             $table->uuid('uuid')->nullable();
-            $table->string('nama_device', 50);
-            $table->string('topic_mqtt', 20);
-            $table->enum('status', ['1', '0'])->default('1');
+            $table->string('kode_board', 20);
+            $table->string('nama_device', 20);
             $table->timestamps();
         });
     }

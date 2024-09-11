@@ -16,7 +16,7 @@ class dht extends Model
     protected $fillable = [
         'id_alat',
         'suhu',
-        'kelembapan',
+        'kelembaban',
     ];
 
     public function level() {

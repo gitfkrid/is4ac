@@ -1,5 +1,33 @@
 @extends('layouts.app_user')
 
+@section('headcontent')
+    <div class="mb-3 d-flex justify-content-between align-items-center">
+        <!-- Button Filter -->
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-filter"></i> Filter
+            </button>
+            <div class="dropdown-menu" aria-labelledby="filterDropdown">
+                <h6 class="dropdown-header">Jenis Alat</h6>
+                <a class="dropdown-item" href="javascript:void(0)" data-filter="all">Semua</a>
+                @foreach ($filter as $id_jenis_alat => $filter)
+                    <a class="dropdown-item" href="javascript:void(0)" data-filter="{{ $id_jenis_alat }}">
+                        {{ $filter }}
+                    </a>
+                @endforeach
+                <div class="dropdown-divider"></div>
+                <h6 class="dropdown-header">Lokasi</h6>
+                @foreach ($lokasi as $lokasiItem)
+                    <a class="dropdown-item" href="javascript:void(0)" data-location="{{ $lokasiItem->id_lokasi }}">
+                        {{ $lokasiItem->nama_lokasi }}
+                    </a>
+                @endforeach
+            </div>
+        </div>
+    </div>
+@endsection
+
 @section('content')
     @if (Session::has('alert'))
         <div class="alert alert-warning alert-dismissible fade show" role="alert">
@@ -10,77 +38,84 @@
         </div>
     @endif
     <div id="alatCards" class="row">
-        <!-- Card -->
-        @foreach ($alat as $index => $device)
-            <div class="col-xl-3 col-md-6 mb-4" data-jenis-alat="{{ $device->id_jenis_alat }}">
-                <div class="card shadow h-100 py-2" style="border-radius: 16px; cursor: pointer;"
-                    onclick="window.location='{{ url('/dashboard/' . $device->uuid) }}'">
-                    <div class="card-body">
-                        <!-- Informasi Device -->
-                        <div class="row no-gutters align-items-center mb-3">
-                            <div class="col-auto">
-                                @if ($device->id_jenis_alat == 1)
-                                    <i class="fas fa-wind fa-2x text-primary"></i>
-                                @else
-                                    <i class="fas fa-thermometer-half fa-2x text-primary"></i>
-                                @endif
-                            </div>
-                            <div class="col ml-3">
-                                <div class="h5 mb-0 font-weight-bold text-primary">{{ $device->nama_device }}</div>
-                                <div class="text-muted">{{ $device->jenis_alat }}</div>
-                            </div>
-                        </div>
-                        <hr>
-                        <!-- Informasi Sensor -->
-                        <div class="row">
-                            <div class="col-6 mb-3 d-flex align-items-center">
-                                <i class="fas fa-hashtag text-muted mr-2"></i>
-                                <div class="d-flex flex-column">
-                                    <div class="small text-muted">Device Number</div>
-                                    <div class="font-weight-bold" style="line-height: 1;">{{ $index + 1 }}</div>
-                                </div>
-                            </div>
-                            <div class="col-6 mb-3 d-flex align-items-center">
-                                <i class="fas fa-flask text-muted mr-2"></i>
-                                <div class="d-flex flex-column">
-                                    <div class="small text-muted">Gas PH3</div>
-                                    <div class="font-weight-bold" style="line-height: 1;">0.03 ppm</div>
-                                </div>
-                            </div>
-                            <div class="col-6 d-flex align-items-center">
-                                <i class="fas fa-thermometer-half text-muted mr-2"></i>
-                                <div class="d-flex flex-column">
-                                    <div class="small text-muted">Temperature</div>
-                                    <div class="font-weight-bold" style="line-height: 1;">28°C</div>
-                                </div>
-                            </div>
-                            <div class="col-6 d-flex align-items-center">
-                                <i class="fas fa-tint text-muted mr-2"></i>
-                                <div class="d-flex flex-column">
-                                    <div class="small text-muted">Humidity</div>
-                                    <div class="font-weight-bold" style="line-height: 1;">70%</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @endforeach
+        @include('dashboard.alatCards')
     </div>
 @endsection
 
 @section('script')
-    <script>
-        function updateTime() {
-            var now = new Date();
-            var hours = String(now.getHours()).padStart(2, '0');
-            var minutes = String(now.getMinutes()).padStart(2, '0');
-            var seconds = String(now.getSeconds()).padStart(2, '0');
-            var currentTime = hours + ':' + minutes + ':' + seconds;
-            document.getElementById('time').innerText = currentTime;
+    <script type="text/javascript">
+        var save_method;
+
+        // Filter
+        $(function() {
+            var selectedJenisAlat = 'all';
+            var selectedLokasi = $('.dropdown-item[data-location]').first().data('location');
+
+            function applyFilters() {
+                $('#alatCards .col-xl-3').each(function() {
+                    var jenisAlat = $(this).data('jenis-alat');
+                    var lokasiAlat = $(this).data('lokasi');
+
+                    var matchJenisAlat = (selectedJenisAlat === 'all' || jenisAlat == selectedJenisAlat);
+                    var matchLokasi = (selectedLokasi === 'all' || lokasiAlat == selectedLokasi);
+
+                    if (matchJenisAlat && matchLokasi) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            }
+
+            $('.dropdown-item[data-filter]').on('click', function() {
+                selectedJenisAlat = $(this).data('filter');
+
+                $('.dropdown-item[data-filter]').removeClass('active');
+                $(this).addClass('active');
+
+                applyFilters();
+            });
+
+            $('.dropdown-item[data-location]').on('click', function() {
+                selectedLokasi = $(this).data('location');
+
+                $('.dropdown-item[data-location]').removeClass('active');
+                $(this).addClass('active');
+
+                applyFilters();
+            });
+
+            $('.dropdown-item[data-filter="all"]').addClass('active');
+            $('.dropdown-item[data-location]').first().addClass('active');
+
+            applyFilters();
+        });
+
+        function initializeToggleListeners() {
+            $('.custom-control-input').off('change').on('change', function() {
+                let kodeBoard = $(this).attr('id').split('_')[1];
+                let state = $(this).is(':checked') ? 1 : 0;
+
+                $.ajax({
+                    url: "dashboard/toggleRelay/" + kodeBoard,
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        state: state
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            console.log('Relay state updated successfully');
+                        } else {
+                            console.error('Failed to update relay state');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error:', error);
+                    }
+                });
+            });
         }
 
-        setInterval(updateTime, 1000);
-        updateTime();
     </script>
 @endsection

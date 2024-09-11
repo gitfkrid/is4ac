@@ -21,4 +21,5 @@ class fosfin extends Model
     public function level() {
         return $this->belongsTo('App\Models\alat', 'id_alat');
     }
+
 }

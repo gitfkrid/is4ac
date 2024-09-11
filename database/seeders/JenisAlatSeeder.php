@@ -19,6 +19,9 @@ class JenisAlatSeeder extends Seeder
             ],
             [
                 'jenis_alat' => 'DHT'
+            ],
+            [
+                'jenis_alat' => 'RELAY'
             ]
         ));
     }
