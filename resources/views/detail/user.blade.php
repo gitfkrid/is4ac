@@ -146,7 +146,7 @@
                             <canvas id="areaChart"></canvas>
                         </div>
                         <hr>
-                        Terakhir di update pada <span id="updated_at">{{ $nilaisensor->updated_at }}</span>
+                        Terakhir di update pada <span id="updated_at_a">{{ $nilaisensor->updated_at }}</span>
                     </div>
                 </div>
             </div>
@@ -162,7 +162,7 @@
                             <canvas id="areaChartHumi"></canvas>
                         </div>
                         <hr>
-                        Terakhir di update pada <span id="updated_at">{{ $nilaisensor->updated_at }}</span>
+                        Terakhir di update pada <span id="updated_at_b">{{ $nilaisensor->updated_at }}</span>
                     </div>
                 </div>
             </div>
@@ -494,7 +494,8 @@
                         $('#kelembaban').text(data.kelembaban);
                     }
                     $('#lokasi').text(data.nama_lokasi);
-                    $('#updated_at').text(data.updated_at);
+                    $('#updated_at_a').text(data.updated_at);
+                    $('#updated_at_b').text(data.updated_at);
                 },
                 error: function() {
                     console.error('Tidak dapat mengambil data sensor.');
