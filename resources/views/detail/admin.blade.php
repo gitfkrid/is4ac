@@ -302,6 +302,7 @@
         $(document).ready(function() {
             $('#exportData').on('click', function() {
                 $('#exportModal').modal('show');
+                $('.modal-titles').text('Export Data');
                 $('#exportModal form')[0].reset();
             });
 

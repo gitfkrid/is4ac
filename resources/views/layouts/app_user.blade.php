@@ -177,7 +177,18 @@
     <!-- Page level custom scripts -->
     <script src="{{ asset('public/assets/js/demo/datatables-demo.js') }}"></script>
     <script src="{{ asset('public/assets/vendor/sweetalert/sweetalert.js') }}"></script>
-
+    <script>
+        function updateTime() {
+            var now = new Date();
+            var hours = String(now.getHours()).padStart(2, '0');
+            var minutes = String(now.getMinutes()).padStart(2, '0');
+            var seconds = String(now.getSeconds()).padStart(2, '0');
+            var currentTime = hours + ':' + minutes + ':' + seconds;
+            document.getElementById('time').innerText = currentTime;
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+    </script>
     @yield('script')
 </body>
 
