@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('id_alat');
             $table->foreign('id_alat')->references('id_alat')->on('alat')->onDelete('cascade');
-            $table->decimal('fosfin', 8, 3);
+            $table->decimal('fosfin', 8, 2);
             $table->timestamps();
         });
     }
