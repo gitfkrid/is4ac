@@ -126,7 +126,7 @@
                     <canvas id="areaChart"></canvas>
                 </div>
                 <hr>
-                Terakhir di update pada <span id="updated_at">{{ $nilaisensor->updated_at }}</span>
+                Terakhir di update pada <span id="updated_at_c">{{ $nilaisensor->updated_at }}</span>
             </div>
         </div>
     @else
@@ -226,258 +226,131 @@
         });
     </script>
 
-    <script src="{{ asset('public/assets/vendor/chart.js/Chart.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
-        var myLineChart, myHumiChart;
+        let chartAInstance;
+        let chartBInstance;
 
-        function showChart() {
-            Chart.defaults.global.defaultFontFamily =
-                "Nunito, '-apple-system', system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif";
-            Chart.defaults.global.defaultFontColor = "#858796";
+        function fetchDataAndUpdateChartA() {
+            var uuid = "{{ $alat->uuid }}";
+            fetch(uuid + "/chart")
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data); // Debugging untuk melihat data yang diterima
 
-            var jenis_alat = "{{ $alat->id_jenis_alat }}";
-            var desimal = jenis_alat == 1 ? 3 : 2;
-
-            function number_format(number, decimals = desimal, dec_point = ".", thousands_sep = ",") {
-                number = (number + "").replace(",", "").replace(" ", "");
-                var n = !isFinite(+number) ? 0 : +number,
-                    prec = !isFinite(+decimals) ? 0 : Math.abs(decimals),
-                    sep = thousands_sep,
-                    dec = dec_point,
-                    s = "",
-                    toFixedFix = function(n, prec) {
-                        var k = Math.pow(10, prec);
-                        return "" + Math.round(n * k) / k;
-                    };
-                s = (prec ? toFixedFix(n, prec) : "" + Math.round(n)).split(".");
-                if (s[0].length > 3) {
-                    s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep);
-                }
-                if ((s[1] || "").length < prec) {
-                    s[1] = s[1] || "";
-                    s[1] += new Array(prec - s[1].length + 1).join("0");
-                }
-                return s.join(dec);
-            }
-
-            // Function to fetch and update the Suhu/Fosfin chart
-            function fetchAndUpdateChart() {
-                var uuid = "{{ $alat->uuid }}";
-                fetch(uuid + "/chart")
-                    .then(response => response.json())
-                    .then(data => {
-                        var ctx1 = document.getElementById("areaChart").getContext("2d");
-                        if (myLineChart) {
-                            myLineChart.data.labels = data.labels;
-                            myLineChart.data.datasets[0].data = data.values;
-                            myLineChart.update();
-                        } else {
-                            myLineChart = new Chart(ctx1, {
-                                type: "line",
-                                data: {
-                                    labels: data.labels,
-                                    datasets: [{
-                                        label: "Sensor Value",
-                                        lineTension: 0.3,
-                                        backgroundColor: "rgba(78, 115, 223, 0.05)",
-                                        borderColor: "rgba(78, 115, 223, 1)",
-                                        pointRadius: 3,
-                                        pointBackgroundColor: "rgba(78, 115, 223, 1)",
-                                        pointBorderColor: "rgba(78, 115, 223, 1)",
-                                        pointHoverRadius: 3,
-                                        pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
-                                        pointHoverBorderColor: "rgba(78, 115, 223, 1)",
-                                        pointHitRadius: 10,
-                                        pointBorderWidth: 2,
-                                        data: data.values,
-                                    }],
-                                },
-                                options: {
-                                    maintainAspectRatio: false,
-                                    layout: {
-                                        padding: {
-                                            left: 10,
-                                            right: 25,
-                                            top: 25,
-                                            bottom: 0,
-                                        },
-                                    },
-                                    scales: {
-                                        xAxes: [{
-                                            time: {
-                                                unit: "time",
-                                            },
-                                            gridLines: {
-                                                display: false,
-                                                drawBorder: false,
-                                            },
-                                            ticks: {
-                                                maxTicksLimit: 7,
-                                            },
-                                        }],
-                                        yAxes: [{
-                                            ticks: {
-                                                maxTicksLimit: 5,
-                                                padding: 10,
-                                                callback: function(value, index, values) {
-                                                    return number_format(value);
-                                                },
-                                            },
-                                            gridLines: {
-                                                color: "rgb(234, 236, 244)",
-                                                zeroLineColor: "rgb(234, 236, 244)",
-                                                drawBorder: false,
-                                                borderDash: [2],
-                                                zeroLineBorderDash: [2],
-                                            },
-                                        }],
-                                    },
-                                    legend: {
-                                        display: false,
-                                    },
-                                    tooltips: {
-                                        backgroundColor: "rgb(255,255,255)",
-                                        bodyFontColor: "#858796",
-                                        titleMarginBottom: 10,
-                                        titleFontColor: "#6e707e",
-                                        titleFontSize: 14,
-                                        borderColor: "#dddfeb",
-                                        borderWidth: 1,
-                                        xPadding: 15,
-                                        yPadding: 15,
-                                        displayColors: false,
-                                        intersect: false,
-                                        mode: "index",
-                                        caretPadding: 10,
-                                        callbacks: {
-                                            label: function(tooltipItem, chart) {
-                                                var datasetLabel = chart.datasets[tooltipItem.datasetIndex]
-                                                    .label || "";
-                                                return datasetLabel + ": " + number_format(tooltipItem
-                                                    .yLabel);
-                                            },
-                                        },
-                                    },
-                                },
-                            });
-                        }
-                    })
-                    .catch(error => console.error("Error fetching sensor data:", error));
-            }
-
-            // Function to fetch and update the Kelembaban chart
-            function fetchAndUpdateHumiChart() {
-                var uuid = "{{ $alat->uuid }}";
-                fetch(uuid + "/chart/kelembaban")
-                    .then(response => response.json())
-                    .then(data => {
-                        var ctx2 = document.getElementById("areaChartHumi").getContext("2d");
-                        if (myHumiChart) {
-                            myHumiChart.data.labels = data.labels;
-                            myHumiChart.data.datasets[0].data = data.values;
-                            myHumiChart.update();
-                        } else {
-                            myHumiChart = new Chart(ctx2, {
-                                type: "line",
-                                data: {
-                                    labels: data.labels,
-                                    datasets: [{
-                                        label: "Humidity",
-                                        lineTension: 0.3,
-                                        backgroundColor: "rgba(28, 200, 138, 0.05)",
-                                        borderColor: "rgba(28, 200, 138, 1)",
-                                        pointRadius: 3,
-                                        pointBackgroundColor: "rgba(28, 200, 138, 1)",
-                                        pointBorderColor: "rgba(28, 200, 138, 1)",
-                                        pointHoverRadius: 3,
-                                        pointHoverBackgroundColor: "rgba(28, 200, 138, 1)",
-                                        pointHoverBorderColor: "rgba(28, 200, 138, 1)",
-                                        pointHitRadius: 10,
-                                        pointBorderWidth: 2,
-                                        data: data.values,
-                                    }],
-                                },
-                                options: {
-                                    maintainAspectRatio: false,
-                                    layout: {
-                                        padding: {
-                                            left: 10,
-                                            right: 25,
-                                            top: 25,
-                                            bottom: 0,
-                                        },
-                                    },
-                                    scales: {
-                                        xAxes: [{
-                                            time: {
-                                                unit: "time",
-                                            },
-                                            gridLines: {
-                                                display: false,
-                                                drawBorder: false,
-                                            },
-                                            ticks: {
-                                                maxTicksLimit: 7,
-                                            },
-                                        }],
-                                        yAxes: [{
-                                            ticks: {
-                                                maxTicksLimit: 5,
-                                                padding: 10,
-                                                callback: function(value, index, values) {
-                                                    return number_format(value);
-                                                },
-                                            },
-                                            gridLines: {
-                                                color: "rgb(234, 236, 244)",
-                                                zeroLineColor: "rgb(234, 236, 244)",
-                                                drawBorder: false,
-                                                borderDash: [2],
-                                                zeroLineBorderDash: [2],
-                                            },
-                                        }],
-                                    },
-                                    legend: {
-                                        display: false,
-                                    },
-                                    tooltips: {
-                                        backgroundColor: "rgb(255,255,255)",
-                                        bodyFontColor: "#858796",
-                                        titleMarginBottom: 10,
-                                        titleFontColor: "#6e707e",
-                                        titleFontSize: 14,
-                                        borderColor: "#dddfeb",
-                                        borderWidth: 1,
-                                        xPadding: 15,
-                                        yPadding: 15,
-                                        displayColors: false,
-                                        intersect: false,
-                                        mode: "index",
-                                        caretPadding: 10,
-                                        callbacks: {
-                                            label: function(tooltipItem, chart) {
-                                                var datasetLabel = chart.datasets[tooltipItem.datasetIndex]
-                                                    .label || "";
-                                                return datasetLabel + ": " + number_format(tooltipItem
-                                                    .yLabel);
-                                            },
-                                        },
-                                    },
-                                },
-                            });
-                        }
-                    })
-                    .catch(error => console.error("Error fetching humidity data:", error));
-            }
-
-            // Fetch data and initialize charts
-            fetchAndUpdateChart();
-            fetchAndUpdateHumiChart();
-            setInterval(fetchAndUpdateChart, 5000);
-            setInterval(fetchAndUpdateHumiChart, 5000);
+                    const ctx = document.getElementById('areaChart');
+                    ctx.style.height = '100%';
+                    ctx.style.width = '100%';
+                    if (chartAInstance) {
+                        // Update chart jika sudah ada
+                        chartAInstance.data.labels = data.labels;
+                        chartAInstance.data.datasets = data.datasets.map(dataset => ({
+                            label: dataset.label,
+                            data: dataset.data,
+                            borderColor: dataset.borderColor,
+                            borderWidth: dataset.borderWidth,
+                            fill: dataset.fill,
+                        }));
+                        chartAInstance.update(); // Perbarui chart
+                    } else {
+                        // Buat instance baru
+                        chartAInstance = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: data.labels,
+                                datasets: data.datasets.map(dataset => ({
+                                    label: dataset.label,
+                                    data: dataset.data,
+                                    borderColor: dataset.borderColor,
+                                    borderWidth: dataset.borderWidth,
+                                    fill: dataset.fill,
+                                }))
+                            },
+                            options: {
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        suggestedMin: Math.min(...data.datasets.flatMap(dataset => dataset
+                                            .data)) - 1,
+                                        suggestedMax: Math.max(...data.datasets.flatMap(dataset => dataset
+                                            .data)) + 1
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    // Panggil kembali fungsi ini setiap menit
+                    setTimeout(fetchDataAndUpdateChartA, 60000); // 60000 ms = 1 menit
+                })
+                .catch(error => {
+                    console.error('Error fetching chart data:', error);
+                    // Tetap coba lagi setelah 1 menit meskipun terjadi error
+                    setTimeout(fetchDataAndUpdateChartA, 60000);
+                });
         }
-        showChart();
+
+        function fetchDataAndUpdateChartB() {
+            var uuid = "{{ $alat->uuid }}";
+            fetch(uuid + "/chart/kelembaban")
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data); // Debugging untuk melihat data yang diterima
+
+                    const ctx = document.getElementById('areaChartHumi');
+                    ctx.style.height = '100%';
+                    ctx.style.width = '100%';
+                    if (chartBInstance) {
+                        // Update chart jika sudah ada
+                        chartBInstance.data.labels = data.labels;
+                        chartBInstance.data.datasets = data.datasets.map(dataset => ({
+                            label: dataset.label,
+                            data: dataset.data,
+                            borderColor: dataset.borderColor,
+                            borderWidth: dataset.borderWidth,
+                            fill: dataset.fill,
+                        }));
+                        chartBInstance.update(); // Perbarui chart
+                    } else {
+                        // Buat instance baru
+                        chartBInstance = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: data.labels,
+                                datasets: data.datasets.map(dataset => ({
+                                    label: dataset.label,
+                                    data: dataset.data,
+                                    borderColor: dataset.borderColor,
+                                    borderWidth: dataset.borderWidth,
+                                    fill: dataset.fill,
+                                }))
+                            },
+                            options: {
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        suggestedMin: Math.min(...data.datasets.flatMap(dataset => dataset
+                                            .data)) - 1,
+                                        suggestedMax: Math.max(...data.datasets.flatMap(dataset => dataset
+                                            .data)) + 1
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    // Panggil kembali fungsi ini setiap menit
+                    setTimeout(fetchDataAndUpdateChartB, 30000); // 60000 ms = 1 menit
+                })
+                .catch(error => {
+                    console.error('Error fetching chart data:', error);
+                    // Tetap coba lagi setelah 1 menit meskipun terjadi error
+                    setTimeout(fetchDataAndUpdateChartB, 30000);
+                });
+        }
+
+        // Panggil fungsi untuk pertama kali
+        fetchDataAndUpdateChartA();
+        fetchDataAndUpdateChartB();
     </script>
 
     {{-- Update Data --}}
@@ -496,6 +369,7 @@
                     $('#lokasi').text(data.nama_lokasi);
                     $('#updated_at_a').text(data.updated_at);
                     $('#updated_at_b').text(data.updated_at);
+                    $('#updated_at_c').text(data.updated_at);
                 },
                 error: function() {
                     console.error('Tidak dapat mengambil data sensor.');

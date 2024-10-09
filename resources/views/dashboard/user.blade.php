@@ -91,6 +91,22 @@
             applyFilters();
         });
 
+        // Show modal form
+        function addForm() {
+            var form = $('#modal-form form');
+            if (form.length > 0) {
+                form[0].reset();
+                $('.modal-title').text('Tambah Device');
+                $('#modal-form').modal('show');
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Tidak dapat memuat Form!',
+                });
+            }
+        }
+
         function initializeToggleListeners() {
             $('.custom-control-input').off('change').on('change', function() {
                 let kodeBoard = $(this).attr('id').split('_')[1];
@@ -117,5 +133,91 @@
             });
         }
 
+        function reloadAlatCards() {
+            // Reload alatCards section
+            $.ajax({
+                url: "{{ route('dashboard.alatCards') }}",
+                type: "GET",
+                success: function(html) {
+                    $('#alatCards').html(html);
+
+                    $('#addDeviceButton').on('click', addForm);
+
+                    var filter = $('.dropdown-item.active[data-filter]').data('filter');
+                    var location = $('.dropdown-item.active[data-location]').data('location');
+
+                    $('#alatCards .col-xl-3').each(function() {
+                        var jenisAlat = $(this).data('jenis-alat');
+                        var lokasiAlat = $(this).data('lokasi');
+                        var show = true;
+
+                        if (filter && filter !== 'all' && jenisAlat !== filter) {
+                            show = false;
+                        }
+
+                        if (location && lokasiAlat !== location) {
+                            show = false;
+                        }
+
+                        $(this).toggle(show);
+                    });
+                    initializeToggleListeners();
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Tidak dapat memuat data!',
+                    });
+                }
+            });
+        }
+
+        $(function() {
+            $('#addDeviceButton').on('click', addForm);
+
+            $('#modal-form form').on('submit', function(e) {
+                e.preventDefault();
+                $.ajax({
+                    url: "{{ route('dashboard.store') }}",
+                    type: "POST",
+                    data: $(this).serialize(),
+                    success: function(data) {
+                        $('#modal-form').modal('hide');
+                        Swal.fire(
+                            'Berhasil!',
+                            'Device berhasil ditambahkan!',
+                            'success'
+                        ).then((result) => {
+                            if (result.isConfirmed) {
+                                reloadAlatCards();
+                                $('#device-container').load('/dashboard/alat/cards',
+                                    function() {
+                                        initializeToggleListeners();
+                                    });
+                            }
+                        });
+                    },
+                    error: function(xhr) {
+                        let errorMessage = 'Tidak dapat menyimpan data!';
+
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            if (xhr.responseJSON.message.includes('validation.unique')) {
+                                errorMessage = 'Nama Device atau Kode Board tidak boleh sama!';
+                            } else {
+                                errorMessage = xhr.responseJSON.message;
+                            }
+                        }
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: errorMessage,
+                        });
+                    }
+                });
+            });
+            initializeToggleListeners();
+        });
     </script>
 @endsection

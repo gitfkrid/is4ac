@@ -20,12 +20,9 @@ Route::group(['middleware' => ['auth', 'cekuser:1']], function () {
     Route::patch('/dashboard/{uuid}', [DetailDashboardController::class, 'update'])->name('detail_dashboard.update');
     Route::delete('/dashboard/{uuid}', [DetailDashboardController::class, 'destroy'])->name('detail_dashboard.destroy');
 
-    Route::get('/dashboard/alat/cards', [DashboardController::class, 'getAlatCards'])->name('dashboard.alatCards');
-    Route::get('/dashboard/alat/sensor', [DashboardController::class, 'getSensorNow'])->name('dashboard.getSensorNow');
     Route::get('/dashboard/{id}/edit', [DashboardController::class, 'edit'])->name('dashboard.edit');
     Route::patch('/dashboard/{id}', [DashboardController::class, 'update'])->name('dashboard.update');
     Route::delete('/dashboard/{id}', [DashboardController::class, 'destroy'])->name('dashboard.destroy');
-    Route::post('/dashboard/toggleRelay/{kode_board}', [DashboardController::class, 'toggleRelay']);
 
     Route::get('/pengguna', [PenggunaController::class, 'index'])->name('pengguna.index');
     Route::get('/pengguna/data', [PenggunaController::class, 'dataPengguna'])->name('pengguna.data');
@@ -41,6 +38,9 @@ Route::group(['middleware' => ['auth', 'cekuser:1']], function () {
     Route::delete('/pengguna/lokasi/{id}', [UserLokasiController::class, 'destroy'])->name('userLokasi.destroy');
 });
 
+Route::post('/dashboard/toggleRelay/{kode_board}', [DashboardController::class, 'toggleRelay']);
+Route::get('/dashboard/alat/cards', [DashboardController::class, 'getAlatCards'])->name('dashboard.alatCards');
+Route::get('/dashboard/alat/sensor', [DashboardController::class, 'getSensorNow'])->name('dashboard.getSensorNow');
 Route::get('/dashboard/{uuid}', [DetailDashboardController::class, 'index'])->name('detail_dashboard.index');
 Route::get('/dashboard/{uuid}/sensor-data', [DetailDashboardController::class, 'getSensorData']);
 Route::get('/dashboard/{uuid}/chart', [DetailDashboardController::class, 'getSensorChartData']);
