@@ -57,7 +57,8 @@
         // Filter
         $(function() {
             var selectedJenisAlat = 'all';
-            var selectedLokasi = $('.dropdown-item[data-location]').first().data('location');
+            var selectedLokasi = localStorage.getItem('selectedLokasi') || $('.dropdown-item[data-location]')
+            .first().data('location');
 
             function applyFilters() {
                 $('#alatCards .col-xl-3').each(function() {
@@ -87,14 +88,24 @@
             $('.dropdown-item[data-location]').on('click', function() {
                 selectedLokasi = $(this).data('location');
 
+                // Simpan lokasi yang diklik ke localStorage
+                localStorage.setItem('selectedLokasi', selectedLokasi);
+
                 $('.dropdown-item[data-location]').removeClass('active');
                 $(this).addClass('active');
 
                 applyFilters();
             });
 
+            // Aktifkan jenis alat 'all'
             $('.dropdown-item[data-filter="all"]').addClass('active');
-            $('.dropdown-item[data-location]').first().addClass('active');
+
+            // Periksa localStorage untuk lokasi terakhir, jika tidak ada gunakan yang pertama
+            $('.dropdown-item[data-location]').each(function() {
+                if ($(this).data('location') == selectedLokasi) {
+                    $(this).addClass('active');
+                }
+            });
 
             applyFilters();
         });

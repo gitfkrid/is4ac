@@ -41,7 +41,8 @@
                                 <i class="fas fa-thermometer-half text-muted mr-2"></i>
                                 <div class="d-flex flex-column">
                                     <div class="small text-muted">Suhu</div>
-                                    <div class="nsuhu font-weight-bold" data-uuid="{{ $device->uuid }}" style="line-height: 1;">{{ $device->suhu }}°C
+                                    <div class="nsuhu font-weight-bold" data-uuid="{{ $device->uuid }}"
+                                        style="line-height: 1;">{{ $device->suhu }}°C
                                     </div>
                                 </div>
                             </div>
@@ -49,7 +50,8 @@
                                 <i class="fas fa-tint text-muted mr-2"></i>
                                 <div class="d-flex flex-column">
                                     <div class="small text-muted">Kelembaban</div>
-                                    <div class="nkelembaban font-weight-bold" data-uuid="{{ $device->uuid }}" style="line-height: 1;">
+                                    <div class="nkelembaban font-weight-bold" data-uuid="{{ $device->uuid }}"
+                                        style="line-height: 1;">
                                         {{ $device->kelembaban }}%</div>
                                 </div>
                             </div>
@@ -68,9 +70,12 @@
             data-lokasi="{{ $device->id_lokasi }}">
             <div class="card shadow h-100 py-2" style="border-radius: 16px;">
                 <div class="card-body">
-                    <!-- Device Number di pojok kanan atas -->
+                    <!-- Icon Delete di pojok kanan atas dengan atribut data-id-alat -->
                     <div style="position: absolute; top: 10px; right: 10px;">
-                        <span class="font-weight-bold text-muted"></span>
+                        <a href="javascript:void(0)" class="text-danger delete-device"
+                            data-id-alat="{{ $device->id_alat }}">
+                            <i class="fas fa-trash-alt"></i>
+                        </a>
                     </div>
                     <!-- Informasi Device -->
                     <div class="row no-gutters align-items-center mb-3">
@@ -127,7 +132,7 @@
                         var $kelembabanElement = $('.nkelembaban[data-uuid="' + device.uuid + '"]');
                         $suhuElement.text(device.suhu ? device.suhu + '°C' : '°C');
                         $kelembabanElement.text(device.kelembaban ? device.kelembaban + '%' :
-                        '%');
+                            '%');
                     }
                 });
             },
@@ -136,6 +141,58 @@
             }
         });
     }
+
+    $(document).ready(function() {
+        // Handle delete button click
+        $('.delete-device').on('click', function() {
+            var deviceId = $(this).data('id-alat'); // Ambil ID dari atribut data-id-alat
+
+            Swal.fire({
+                title: 'Apakah anda yakin?',
+                text: "Data Device akan dihapus!",
+                icon: 'warning',
+                showCancelButton: true,
+                cancelButtonColor: '#d33',
+                confirmButtonColor: "#4E73DF",
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "{{ url('dashboard') }}/" + deviceId + "/delete",
+                        type: 'POST',
+                        data: {
+                            '_method': 'DELETE',
+                            '_token': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function() {
+                            Swal.fire(
+                                'Berhasil!',
+                                'Data Device terhapus.',
+                                'success'
+                            ).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href =
+                                        "{{ route('dashboard') }}";
+                                }
+                            });
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Tidak dapat menghapus data! Kesalahan: ' +
+                                    error,
+                            });
+                            console.log('Error detail:', xhr
+                            .responseText); // Log error detail
+                        }
+                    });
+
+                }
+            });
+        });
+    });
 
     setInterval(fetchSensorData, 3000);
 </script>

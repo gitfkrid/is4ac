@@ -173,6 +173,12 @@ class DashboardController extends Controller
     public function destroy($id)
     {
         $alat = alat::find($id);
-        $alat->delete();
+
+        if ($alat) {
+            $alat->delete();
+            return response()->json(['success' => 'Device deleted successfully']);
+        }
+
+        return response()->json(['error' => 'Device not found'], 404);
     }
 }

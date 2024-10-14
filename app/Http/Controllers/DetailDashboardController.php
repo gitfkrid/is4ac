@@ -110,100 +110,37 @@ class DetailDashboardController extends Controller
             return response()->json(['error' => 'Alat tidak ditemukan'], 404);
         }
 
-        // Ambil semua alat dengan id_lokasi yang sama
-        $alatLainnya = Alat::where('id_lokasi', $alat->id_lokasi)->get();
-
-        // Ambil data untuk semua alat yang relevan
         $data = [];
+
         if ($alat->id_jenis_alat == 1) { // PH3
-            $data = Fosfin::whereIn('id_alat', $alatLainnya->pluck('id_alat'))
-                ->select('fosfin', 'id_alat', 'updated_at')
+            $data = Fosfin::where('id_alat', $alat->id_alat)
                 ->orderBy('updated_at', 'desc')
-                ->get()
-                ->groupBy('id_alat'); // Kelompokkan data berdasarkan id_alat
+                ->limit(60)
+                ->get(['fosfin', 'updated_at']);
         } elseif ($alat->id_jenis_alat == 2) { // DHT
-            $data = Dht::whereIn('id_alat', $alatLainnya->pluck('id_alat'))
-                ->select('suhu', 'id_alat', 'updated_at')
+            $data = Dht::where('id_alat', $alat->id_alat)
                 ->orderBy('updated_at', 'desc')
-                ->get()
-                ->groupBy('id_alat'); // Kelompokkan data berdasarkan id_alat
+                ->limit(60)
+                ->get(['suhu', 'updated_at']);
         }
 
         if ($data->isEmpty()) {
             return response()->json(['error' => 'Data sensor tidak tersedia'], 404);
         }
 
-        // Urutkan data berdasarkan id_alat (ascending)
-        $data = $data->sortKeys();
-
         // Format data untuk chart
         $formattedData = [
             'labels' => [],
-            'datasets' => []
+            'values' => []
         ];
 
-        $alatTerlama = null;
-        $waktuTerlama = null;
-
-        // Temukan id_alat dengan waktu terlama
-        foreach ($data as $idAlat => $entries) {
-            // Ambil data terbaru untuk setiap alat
-            $latestEntry = $entries->first(); // Karena sudah diurutkan berdasarkan waktu (desc)
-            if (!$waktuTerlama || $latestEntry->updated_at > $waktuTerlama) {
-                $alatTerlama = $idAlat;
-                $waktuTerlama = $latestEntry->updated_at;
-            }
+        foreach ($data as $entry) {
+            $formattedData['labels'][] = $entry->updated_at->format('H:i');
+            $formattedData['values'][] = $alat->id_jenis_alat == 1 ? $entry->fosfin : $entry->suhu;
         }
 
-        // Ambil waktu dari alat dengan waktu terlama
-        $labels = $data[$alatTerlama]->take(30)->pluck('updated_at')->map(function ($time) {
-            return \Carbon\Carbon::parse($time)->format('H:i');
-        })->reverse()->values()->toArray();
-
-        // Array warna yang sudah ditentukan
-        $colors = [
-            'rgba(255, 99, 132, 1)',  // Merah
-            'rgba(54, 162, 235, 1)',  // Biru
-            'rgba(255, 206, 86, 1)',  // Kuning
-            'rgba(75, 192, 192, 1)',  // Hijau
-            'rgba(153, 102, 255, 1)', // Ungu
-            'rgba(255, 159, 64, 1)',  // Oranye
-            'rgba(201, 203, 207, 1)', // Abu-abu
-            'rgba(255, 0, 255, 1)',   // Magenta
-            'rgba(0, 255, 0, 1)',     // Hijau terang
-            'rgba(0, 0, 255, 1)'      // Biru terang
-        ];
-
-        // Track warna yang sudah digunakan untuk memastikan tidak ada yang terulang
-        $usedColors = [];
-
-        // Mengelompokkan data berdasarkan id_alat dan membatasi data maksimal 30 per alat
-        foreach ($data as $idAlat => $entries) {
-            // Batasi maksimal 30 data per alat
-            $entries = $entries->take(30);
-
-            // Cari nama device dari alat
-            $namaDevice = $alatLainnya->where('id_alat', $idAlat)->first()->nama_device ?? 'Alat ' . $idAlat;
-
-            // Pilih warna yang belum digunakan
-            $availableColors = array_diff($colors, $usedColors); // Ambil warna yang belum dipakai
-            $selectedColor = array_shift($availableColors); // Ambil satu warna
-            $usedColors[] = $selectedColor; // Simpan warna yang sudah dipakai
-
-            // Tambahkan dataset
-            $formattedData['datasets'][] = [
-                'label' => $namaDevice, // Gunakan nama_device sebagai label
-                'data' => $entries->map(function ($entry) use ($alat, $idAlat) {
-                    return $alat->id_jenis_alat == 1 ? $entry->fosfin : $entry->suhu;
-                })->reverse()->values()->toArray(),
-                'borderColor' => $selectedColor, // Gunakan warna yang dipilih
-                'borderWidth' => 2,
-                'fill' => false,
-            ];
-        }
-
-        // Set label berdasarkan waktu dari alat dengan waktu terlama
-        $formattedData['labels'] = $labels;
+        $formattedData['labels'] = array_reverse($formattedData['labels']);
+        $formattedData['values'] = array_reverse($formattedData['values']);
 
         return response()->json($formattedData);
     }
@@ -216,82 +153,28 @@ class DetailDashboardController extends Controller
             return response()->json(['error' => 'Alat tidak ditemukan'], 404);
         }
 
-        // Ambil semua alat dengan id_lokasi yang sama
-        $alatLainnya = Alat::where('id_lokasi', $alat->id_lokasi)->get();
-
-        // Ambil data kelembaban untuk semua alat yang relevan
-        $data = Dht::whereIn('id_alat', $alatLainnya->pluck('id_alat'))
-            ->select('kelembaban', 'id_alat', 'updated_at')
+        $data = Dht::where('id_alat', $alat->id_alat)
             ->orderBy('updated_at', 'desc')
-            ->get()
-            ->groupBy('id_alat'); // Kelompokkan berdasarkan id_alat
+            ->limit(60)
+            ->get(['kelembaban', 'updated_at']);
 
         if ($data->isEmpty()) {
             return response()->json(['error' => 'Data sensor tidak tersedia'], 404);
         }
 
-        // Urutkan data berdasarkan id_alat (ascending)
-        $data = $data->sortKeys();
-
         // Format data untuk chart
         $formattedData = [
             'labels' => [],
-            'datasets' => []
+            'values' => []
         ];
 
-        $alatTerlama = null;
-        $waktuTerlama = null;
-
-        // Temukan id_alat dengan waktu terlama
-        foreach ($data as $idAlat => $entries) {
-            $latestEntry = $entries->first(); // Karena sudah diurutkan berdasarkan waktu (desc)
-            if (!$waktuTerlama || $latestEntry->updated_at > $waktuTerlama) {
-                $alatTerlama = $idAlat;
-                $waktuTerlama = $latestEntry->updated_at;
-            }
+        foreach ($data as $entry) {
+            $formattedData['labels'][] = $entry->updated_at->format('H:i');
+            $formattedData['values'][] = $entry->kelembaban;
         }
 
-        // Ambil waktu dari alat dengan waktu terlama
-        $labels = $data[$alatTerlama]->take(30)->pluck('updated_at')->map(function ($time) {
-            return \Carbon\Carbon::parse($time)->format('H:i');
-        })->reverse()->values()->toArray();
-
-        // Mengelompokkan data kelembaban berdasarkan id_alat dan membatasi data maksimal 30 per alat
-        foreach ($data as $idAlat => $entries) {
-            // Batasi maksimal 30 data per alat
-            $entries = $entries->take(30);
-
-            // Cari nama device dari alat
-            $namaDevice = $alatLainnya->where('id_alat', $idAlat)->first()->nama_device ?? 'Alat ' . $idAlat;
-
-            // Array warna yang sudah ditentukan
-            $colors = [
-                'rgba(255, 99, 132, 1)',  // Merah
-                'rgba(54, 162, 235, 1)',  // Biru
-                'rgba(255, 206, 86, 1)',   // Kuning
-                'rgba(75, 192, 192, 1)',   // Hijau
-                'rgba(153, 102, 255, 1)',  // Ungu
-                'rgba(255, 159, 64, 1)',   // Oranye
-                'rgba(201, 203, 207, 1)',  // Abu-abu
-                'rgba(255, 0, 255, 1)',    // Magenta
-                'rgba(0, 255, 0, 1)',      // Hijau terang
-                'rgba(0, 0, 255, 1)'       // Biru terang
-            ];
-
-            // Buat dataset untuk setiap alat
-            $formattedData['datasets'][] = [
-                'label' => $namaDevice, // Gunakan nama_device sebagai label
-                'data' => $entries->map(function ($entry) {
-                    return $entry->kelembaban;
-                })->reverse()->values()->toArray(),
-                'borderColor' => $colors[array_rand($colors)],
-                'borderWidth' => 2,
-                'fill' => false,
-            ];
-        }
-
-        // Set label berdasarkan waktu dari alat dengan waktu terlama
-        $formattedData['labels'] = $labels;
+        $formattedData['labels'] = array_reverse($formattedData['labels']);
+        $formattedData['values'] = array_reverse($formattedData['values']);
 
         return response()->json($formattedData);
     }

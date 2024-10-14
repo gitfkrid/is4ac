@@ -22,7 +22,7 @@ Route::group(['middleware' => ['auth', 'cekuser:1']], function () {
 
     Route::get('/dashboard/{id}/edit', [DashboardController::class, 'edit'])->name('dashboard.edit');
     Route::patch('/dashboard/{id}', [DashboardController::class, 'update'])->name('dashboard.update');
-    Route::delete('/dashboard/{id}', [DashboardController::class, 'destroy'])->name('dashboard.destroy');
+    Route::delete('/dashboard/{id}/delete', [DashboardController::class, 'destroy'])->name('dashboard.destroy');
 
     Route::get('/pengguna', [PenggunaController::class, 'index'])->name('pengguna.index');
     Route::get('/pengguna/data', [PenggunaController::class, 'dataPengguna'])->name('pengguna.data');

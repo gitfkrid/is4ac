@@ -323,4 +323,57 @@ class GetSensorController extends Controller
             ], 500);
         }
     }
+
+
+    public function getJamFosfin(Request $request)
+    {
+        try {
+            // Mendapatkan id_lokasi dan jam_awal dari body request
+            $id_lokasi = $request->input('id_lokasi');
+            $jam_awal = $request->input('jam_awal');
+
+            // Menentukan jam akhir berdasarkan jam awal + 1 jam
+            $jam_akhir = date('H:i:s', strtotime($jam_awal . ' +1 hour'));
+
+            $avgFosfin = DB::select(
+                "SELECT
+                DATE_FORMAT(fosfin.created_at, '%H:%i') AS Waktu,
+                ROUND(AVG(fosfin.fosfin), 2) AS Nilai
+            FROM
+                alat
+            JOIN
+                fosfin ON fosfin.id_alat = alat.id_alat
+            WHERE
+                alat.id_lokasi = ?
+                AND DATE(fosfin.created_at) = CURDATE()
+                AND TIME(fosfin.created_at) BETWEEN ? AND ?
+            GROUP BY
+                Waktu
+            ORDER BY
+                Waktu ASC;",
+                [$id_lokasi, $jam_awal, $jam_akhir] // Parameter binding
+            );
+
+            if (count($avgFosfin) > 0) {
+                return response()->json([
+                    'success' => true,
+                    'data' => $avgFosfin
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data not found',
+                    'error' => 'Belum ada data hari ini'
+                ], 404);
+            }
+        } catch (\Exception $e) {
+            // Log the exception message
+            Log::error('Exception: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal server error'
+            ], 500);
+        }
+    }
 }

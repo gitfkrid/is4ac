@@ -20,6 +20,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/sensor/data/Fosfina/{id_lokasi}', [GetSensorController::class, 'getAvgFosfina']);
     Route::post('/sensor/data/Suhu/detail', [GetSensorController::class, 'getJamSuhu']);
     Route::post('/sensor/data/Kelembaban/detail', [GetSensorController::class, 'getJamKelembaban']);
+    Route::post('/sensor/data/Fosfin/detail', [GetSensorController::class, 'getJamFosfin']);
     Route::post('/logout', [UserController::class, 'logout']);
 });
 
