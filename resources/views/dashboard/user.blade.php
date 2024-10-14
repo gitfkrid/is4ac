@@ -48,8 +48,10 @@
 
         // Filter
         $(function() {
-            var selectedJenisAlat = 'all';
-            var selectedLokasi = $('.dropdown-item[data-location]').first().data('location');
+            // Ambil pilihan jenis alat dan lokasi dari localStorage atau default ke 'all' dan lokasi pertama
+            var selectedJenisAlat = localStorage.getItem('selectedJenisAlat') || 'all';
+            var selectedLokasi = localStorage.getItem('selectedLokasi') || $('.dropdown-item[data-location]')
+                .first().data('location');
 
             function applyFilters() {
                 $('#alatCards .col-xl-3').each(function() {
@@ -67,8 +69,12 @@
                 });
             }
 
+            // Event listener untuk jenis alat
             $('.dropdown-item[data-filter]').on('click', function() {
                 selectedJenisAlat = $(this).data('filter');
+
+                // Simpan jenis alat yang dipilih ke localStorage
+                localStorage.setItem('selectedJenisAlat', selectedJenisAlat);
 
                 $('.dropdown-item[data-filter]').removeClass('active');
                 $(this).addClass('active');
@@ -76,8 +82,12 @@
                 applyFilters();
             });
 
+            // Event listener untuk lokasi
             $('.dropdown-item[data-location]').on('click', function() {
                 selectedLokasi = $(this).data('location');
+
+                // Simpan lokasi yang dipilih ke localStorage
+                localStorage.setItem('selectedLokasi', selectedLokasi);
 
                 $('.dropdown-item[data-location]').removeClass('active');
                 $(this).addClass('active');
@@ -85,8 +95,19 @@
                 applyFilters();
             });
 
-            $('.dropdown-item[data-filter="all"]').addClass('active');
-            $('.dropdown-item[data-location]').first().addClass('active');
+            // Aktifkan jenis alat berdasarkan pilihan dari localStorage
+            $('.dropdown-item[data-filter]').each(function() {
+                if ($(this).data('filter') == selectedJenisAlat) {
+                    $(this).addClass('active');
+                }
+            });
+
+            // Aktifkan lokasi berdasarkan pilihan dari localStorage atau default ke lokasi pertama
+            $('.dropdown-item[data-location]').each(function() {
+                if ($(this).data('location') == selectedLokasi) {
+                    $(this).addClass('active');
+                }
+            });
 
             applyFilters();
         });
