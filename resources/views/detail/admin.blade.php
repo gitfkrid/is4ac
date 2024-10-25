@@ -345,7 +345,7 @@
         });
     </script>
 
-    <script src="{{ asset('public/assets/vendor/chart.js/Chart.min.js') }}"></script>
+    <script src="{{ asset('public/assets/vendor/chart.js/Chart.js') }}"></script>
 
     <script>
         var myLineChart, myHumiChart;

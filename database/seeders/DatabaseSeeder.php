@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             JenisAlatSeeder::class,
             LokasiSeeder::class,
             AdminLokasiSeeder::class,
+            NilaiBatasSeeder::class,
         ]);
     }
 }

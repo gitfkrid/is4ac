@@ -3,28 +3,36 @@
 @section('headcontent')
     <div class="mb-3 d-flex justify-content-between align-items-center">
         <!-- Button Filter -->
-        <div class="dropdown">
-            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown" data-toggle="dropdown"
-                aria-haspopup="true" aria-expanded="false">
-                <i class="fa fa-filter"></i> Filter
-            </button>
-            <div class="dropdown-menu" aria-labelledby="filterDropdown">
-                <h6 class="dropdown-header">Jenis Alat</h6>
-                <a class="dropdown-item" href="javascript:void(0)" data-filter="all">Semua</a>
-                @foreach ($filter as $id_jenis_alat => $filter)
-                    <a class="dropdown-item" href="javascript:void(0)" data-filter="{{ $id_jenis_alat }}">
-                        {{ $filter }}
-                    </a>
-                @endforeach
-                <div class="dropdown-divider"></div>
-                <h6 class="dropdown-header">Lokasi</h6>
-                @foreach ($lokasi as $lokasiItem)
-                    <a class="dropdown-item" href="javascript:void(0)" data-location="{{ $lokasiItem->id_lokasi }}">
-                        {{ $lokasiItem->nama_lokasi }}
-                    </a>
-                @endforeach
+        <div class="d-flex align-items-center">
+            <div class="dropdown mr-2">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fa fa-filter"></i> Filter
+                </button>
+                <div class="dropdown-menu" aria-labelledby="filterDropdown">
+                    <h6 class="dropdown-header">Jenis Alat</h6>
+                    <a class="dropdown-item" href="javascript:void(0)" data-filter="all">Semua</a>
+                    @foreach ($filter as $id_jenis_alat => $filter)
+                        <a class="dropdown-item" href="javascript:void(0)" data-filter="{{ $id_jenis_alat }}">
+                            {{ $filter }}
+                        </a>
+                    @endforeach
+                    <div class="dropdown-divider"></div>
+                    <h6 class="dropdown-header">Lokasi</h6>
+                    @foreach ($lokasi as $lokasiItem)
+                        <a class="dropdown-item" href="javascript:void(0)" data-location="{{ $lokasiItem->id_lokasi }}">
+                            {{ $lokasiItem->nama_lokasi }}
+                        </a>
+                    @endforeach
+                </div>
             </div>
+
+            <!-- Button Nilai Batas -->
+            <button class="btn btn-outline-secondary mr-2" id="nilaiBatasButton">
+                <i class="fa fa-sliders-h"></i> Nilai Batas
+            </button>
         </div>
+        @include('dashboard.nilaiForm')
 
         <!-- Tombol Tambah Device dan Delete Device -->
         <div class="d-flex align-items-center">
@@ -135,6 +143,70 @@
                 });
             }
         }
+
+        $(document).ready(function() {
+            $('#nilaiBatasButton').on('click', function() {
+                save_method = 'edit';
+                $('input[name=_method]').val('PATCH');
+                $.ajax({
+                    url: "{{ route('nilaibatas.edit') }}",
+                    type: "GET",
+                    success: function(data) {
+                        // Set nilai pada form modal sesuai dengan data yang diterima
+                        $('#nb_suhu_atas').val(data.nb_suhu_atas);
+                        $('#nb_suhu_bawah').val(data.nb_suhu_bawah);
+                        $('#nb_rh_atas').val(data.nb_rh_atas);
+                        $('#nb_rh_bawah').val(data.nb_rh_bawah);
+                        $('#nb_ph3_atas').val(data.nb_ph3_atas);
+                        $('#nb_ph3_bawah').val(data.nb_ph3_bawah);
+
+                        // Tampilkan modal
+                        $('#modal-nilai-batas').modal('show');
+                        $('.modal-title').text('Edit Nilai Batas');
+                    },
+                    error: function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Tidak dapat mengambil data!',
+                        })
+                    }
+                });
+            });
+
+            $('#nilaiBatasForm').on('submit', function(e) {
+                e.preventDefault();
+                isi = $('#nilaiBatasForm').serialize();
+
+                $.ajax({
+                    url: "{{ route('nilaibatas.update') }}",
+                    type: "POST",
+                    data: isi,
+                    dataType: 'json',
+                    success: function(response) {
+                        $('#modal-nilai-batas').modal('hide');
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: response
+                                .success,
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location
+                                    .reload();
+                            }
+                        });
+                    },
+                    error: function(xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: 'Terjadi kesalahan saat mengupdate data!',
+                        });
+                    }
+                });
+            });
+        });
 
         function initializeToggleListeners() {
             $('.custom-control-input').off('change').on('change', function() {

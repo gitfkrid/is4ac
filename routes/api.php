@@ -26,4 +26,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::post('/sensor/fosfin', [FosfinController::class, 'store']);
 Route::post('/sensor/dht', [DhtController::class, 'store']);
+Route::post('/relay', [RelayController::class, 'getRelay']);
+Route::post('/relay/toogle', [RelayController::class, 'toggleRelay']);
 Route::get('/relay/{kode_board}/state', [RelayController::class, 'getRelayState']);
+Route::post('/relay/{kode_board}/state', [RelayController::class, 'getRelayState']);
