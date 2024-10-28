@@ -34,6 +34,17 @@
                         <label for="nb_ph3_bawah">PH3 Bawah</label>
                         <input type="text" class="form-control" id="nb_ph3_bawah" name="nb_ph3_bawah">
                     </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="status" id="statusOtomatis" value="1">
+                            <label class="form-check-label" for="statusOtomatis">Otomatis</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="status" id="statusManual" value="0">
+                            <label class="form-check-label" for="statusManual">Manual</label>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">

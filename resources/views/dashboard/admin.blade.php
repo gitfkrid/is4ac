@@ -27,9 +27,9 @@
                 </div>
             </div>
 
-            <!-- Button Nilai Batas -->
+            <!-- Button Otomatisasi -->
             <button class="btn btn-outline-secondary mr-2" id="nilaiBatasButton">
-                <i class="fa fa-sliders-h"></i> Nilai Batas
+                <i class="fa fa-sliders-h"></i> Otomatis
             </button>
         </div>
         @include('dashboard.nilaiForm')
@@ -160,6 +160,12 @@
                         $('#nb_ph3_atas').val(data.nb_ph3_atas);
                         $('#nb_ph3_bawah').val(data.nb_ph3_bawah);
 
+                        if (parseInt(data.status) === 1) {
+                            $('#statusOtomatis').prop('checked', true);
+                        } else {
+                            $('#statusManual').prop('checked', true);
+                        }
+
                         // Tampilkan modal
                         $('#modal-nilai-batas').modal('show');
                         $('.modal-title').text('Edit Nilai Batas');
@@ -224,11 +230,24 @@
                         if (response.success) {
                             console.log('Relay state updated successfully');
                         } else {
-                            console.error('Failed to update relay state');
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Peringatan',
+                                text: response.message,
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    location.reload();
+                                }
+                            });
                         }
                     },
                     error: function(xhr, status, error) {
                         console.error('Error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: 'Terjadi kesalahan saat memperbarui relay.',
+                        });
                     }
                 });
             });

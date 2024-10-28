@@ -12,7 +12,7 @@ class nilaibatas extends Model
 
     protected $primaryKey = 'id_nilaibatas';
     protected $fillable = [
-        'nb_suhu_atas', 'nb_suhu_bawah', 'nb_rh_atas', 'nb_rh_bawah', 'nb_ph3_atas', 'nb_ph3_bawah'
+        'nb_suhu_atas', 'nb_suhu_bawah', 'nb_rh_atas', 'nb_rh_bawah', 'nb_ph3_atas', 'nb_ph3_bawah', 'status'
     ];
     public $timestamps = false;
 

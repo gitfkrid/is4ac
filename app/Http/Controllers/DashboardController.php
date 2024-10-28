@@ -136,14 +136,21 @@ class DashboardController extends Controller
     public function toggleRelay(Request $request, $kode_board)
     {
         $alat = DB::table('alat')->where('kode_board', $kode_board)->first();
+        $batas = DB::table('nilaibatas')->first();
 
-        if ($alat) {
+        if ($alat && $batas->status == 0) {
             DB::table('relay')
                 ->where('id_alat', $alat->id_alat)
                 ->update(['state' => $request->state]);
 
             return response()->json(['success' => true]);
-        } else {
+        } else if ($alat && $batas->status == 1) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Sedang pada mode otomatis, perubahan tidak dapat dilakukan.'
+            ]);
+        }
+        else {
             return response()->json(['success' => false, 'message' => 'Relay not found']);
         }
     }

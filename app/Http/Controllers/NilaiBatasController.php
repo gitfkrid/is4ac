@@ -28,6 +28,7 @@ class NilaiBatasController extends Controller
             'nb_rh_bawah' => $request->nb_rh_bawah,
             'nb_ph3_atas' => $request->nb_ph3_atas,
             'nb_ph3_bawah' => $request->nb_ph3_bawah,
+            'status' => $request->status,
         ]);
 
         return response()->json(['success' => 'Data berhasil diupdate.']);

@@ -37,11 +37,10 @@ Route::group(['middleware' => ['auth', 'cekuser:1']], function () {
     Route::get('/pengguna/lokasi/{id}/edit', [UserLokasiController::class, 'edit'])->name('userLokasi.edit');
     Route::post('/pengguna/lokasi/update', [UserLokasiController::class, 'update'])->name('userLokasi.update');
     Route::delete('/pengguna/lokasi/{id}', [UserLokasiController::class, 'destroy'])->name('userLokasi.destroy');
-
-    Route::get('/dashboard/nilaibatas', [NilaiBatasController::class, 'edit'])->name('nilaibatas.edit');
-    Route::patch('/dashboard/nilaibatas/update', [NilaiBatasController::class, 'update'])->name('nilaibatas.update');
 });
 
+Route::get('/dashboard/nilaibatas', [NilaiBatasController::class, 'edit'])->name('nilaibatas.edit');
+Route::patch('/dashboard/nilaibatas/update', [NilaiBatasController::class, 'update'])->name('nilaibatas.update');
 Route::post('/dashboard/toggleRelay/{kode_board}', [DashboardController::class, 'toggleRelay']);
 Route::get('/dashboard/alat/cards', [DashboardController::class, 'getAlatCards'])->name('dashboard.alatCards');
 Route::get('/dashboard/alat/sensor', [DashboardController::class, 'getSensorNow'])->name('dashboard.getSensorNow');

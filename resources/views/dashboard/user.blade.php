@@ -3,7 +3,7 @@
 @section('headcontent')
     <div class="mb-3 d-flex justify-content-between align-items-center">
         <!-- Button Filter -->
-        <div class="dropdown">
+        <div class="dropdown mr-2">
             <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown" data-toggle="dropdown"
                 aria-haspopup="true" aria-expanded="false">
                 <i class="fa fa-filter"></i> Filter
@@ -25,7 +25,13 @@
                 @endforeach
             </div>
         </div>
+
+        <!-- Button Otomatisasi -->
+        <button class="btn btn-outline-secondary mr-2" id="nilaiBatasButton">
+            <i class="fa fa-sliders-h"></i> Otomatis
+        </button>
     </div>
+    @include('dashboard.nilaiForm')
 @endsection
 
 @section('content')
@@ -128,6 +134,76 @@
             }
         }
 
+        $(document).ready(function() {
+            $('#nilaiBatasButton').on('click', function() {
+                save_method = 'edit';
+                $('input[name=_method]').val('PATCH');
+                $.ajax({
+                    url: "{{ route('nilaibatas.edit') }}",
+                    type: "GET",
+                    success: function(data) {
+                        // Set nilai pada form modal sesuai dengan data yang diterima
+                        $('#nb_suhu_atas').val(data.nb_suhu_atas);
+                        $('#nb_suhu_bawah').val(data.nb_suhu_bawah);
+                        $('#nb_rh_atas').val(data.nb_rh_atas);
+                        $('#nb_rh_bawah').val(data.nb_rh_bawah);
+                        $('#nb_ph3_atas').val(data.nb_ph3_atas);
+                        $('#nb_ph3_bawah').val(data.nb_ph3_bawah);
+
+                        if (parseInt(data.status) === 1) {
+                            $('#statusOtomatis').prop('checked', true);
+                        } else {
+                            $('#statusManual').prop('checked', true);
+                        }
+
+                        // Tampilkan modal
+                        $('#modal-nilai-batas').modal('show');
+                        $('.modal-title').text('Edit Nilai Batas');
+                    },
+                    error: function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Tidak dapat mengambil data!',
+                        })
+                    }
+                });
+            });
+
+            $('#nilaiBatasForm').on('submit', function(e) {
+                e.preventDefault();
+                isi = $('#nilaiBatasForm').serialize();
+
+                $.ajax({
+                    url: "{{ route('nilaibatas.update') }}",
+                    type: "POST",
+                    data: isi,
+                    dataType: 'json',
+                    success: function(response) {
+                        $('#modal-nilai-batas').modal('hide');
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: response
+                                .success,
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location
+                                    .reload();
+                            }
+                        });
+                    },
+                    error: function(xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: 'Terjadi kesalahan saat mengupdate data!',
+                        });
+                    }
+                });
+            });
+        });
+
         function initializeToggleListeners() {
             $('.custom-control-input').off('change').on('change', function() {
                 let kodeBoard = $(this).attr('id').split('_')[1];
@@ -144,11 +220,24 @@
                         if (response.success) {
                             console.log('Relay state updated successfully');
                         } else {
-                            console.error('Failed to update relay state');
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Peringatan',
+                                text: response.message,
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    location.reload();
+                                }
+                            });
                         }
                     },
                     error: function(xhr, status, error) {
                         console.error('Error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: 'Terjadi kesalahan saat memperbarui relay.',
+                        });
                     }
                 });
             });
