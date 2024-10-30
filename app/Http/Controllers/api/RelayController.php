@@ -57,7 +57,6 @@ class RelayController extends Controller
                 ], 404);
             }
         } catch (\Exception $e) {
-            // Log the exception message
             Log::error('Exception: ' . $e->getMessage());
 
             return response()->json([
@@ -80,14 +79,20 @@ class RelayController extends Controller
 
         // Cari relay berdasarkan kode_board
         $alat = DB::table('alat')->where('kode_board', $kode_board)->first();
+        $batas = DB::table('nilaibatas')->first();
 
         // Jika relay ditemukan, lakukan update
-        if ($alat) {
+        if ($alat && $batas->status == 0) {
             DB::table('relay')
                 ->where('id_alat', $alat->id_alat)
                 ->update(['state' => $state]);
 
             return response()->json(['success' => true]);
+        } else if ($alat && $batas->status == 1) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Sedang pada mode otomatis, perubahan tidak dapat dilakukan.'
+            ]);
         } else {
             // Jika relay tidak ditemukan, return error
             return response()->json(['success' => false, 'message' => 'Relay not found']);
