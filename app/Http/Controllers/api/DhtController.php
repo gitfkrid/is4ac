@@ -48,7 +48,7 @@ class DhtController extends Controller
             (($avgKelembaban > $batas->nb_rh_atas || $avgKelembaban < $batas->nb_rh_bawah) && $batas->status == 1)
         ) {
             DB::table('relay')->update(['state' => 1]);
-        } else {
+        } else if ($batas->status == 1) {
             DB::table('relay')->update(['state' => 0]);
         }
 
