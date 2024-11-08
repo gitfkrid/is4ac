@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\nilaibatas;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class NilaiBatasController extends Controller
 {
@@ -30,6 +31,10 @@ class NilaiBatasController extends Controller
             'nb_ph3_bawah' => $request->nb_ph3_bawah,
             'status' => $request->status,
         ]);
+
+        if ($request->status == 0) {
+            DB::table('relay')->update(['state' => 0]);
+        }
 
         return response()->json(['success' => 'Data berhasil diupdate.']);
     }
