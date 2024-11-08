@@ -581,7 +581,7 @@
                                             title: function(tooltipItems, data) {
                                                 // Show the humidity value as the title (bold text at the top)
                                                 var humidityValue = number_format(tooltipItems[0].yLabel);
-                                                return 'Humidity: ' + humidityValue;
+                                                return 'RH: ' + humidityValue + '%';
                                             },
                                             label: function(tooltipItem) {
                                                 // Display the time in regular font below the humidity value
