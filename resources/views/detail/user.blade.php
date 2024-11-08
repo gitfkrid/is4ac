@@ -228,6 +228,7 @@
 
     <script src="{{ asset('public/assets/vendor/chart.js/Chart.min.js') }}"></script>
 
+
     <script>
         var myLineChart, myHumiChart;
 
@@ -351,11 +352,14 @@
                                         mode: "index",
                                         caretPadding: 10,
                                         callbacks: {
-                                            label: function(tooltipItem, chart) {
-                                                var datasetLabel = chart.datasets[tooltipItem.datasetIndex]
-                                                    .label || "";
-                                                return datasetLabel + ": " + number_format(tooltipItem
-                                                    .yLabel);
+                                            title: function(tooltipItems, data) {
+                                                // Show the sensor value as the title (bold text at the top)
+                                                var sensorValue = number_format(tooltipItems[0].yLabel);
+                                                return 'Value: ' + sensorValue;
+                                            },
+                                            label: function(tooltipItem) {
+                                                // Display the time in regular font below the sensor value
+                                                return tooltipItem.label;
                                             },
                                         },
                                     },
@@ -456,14 +460,18 @@
                                         mode: "index",
                                         caretPadding: 10,
                                         callbacks: {
-                                            label: function(tooltipItem, chart) {
-                                                var datasetLabel = chart.datasets[tooltipItem.datasetIndex]
-                                                    .label || "";
-                                                return datasetLabel + ": " + number_format(tooltipItem
-                                                    .yLabel);
+                                            title: function(tooltipItems, data) {
+                                                // Show the humidity value as the title (bold text at the top)
+                                                var humidityValue = number_format(tooltipItems[0].yLabel);
+                                                return 'Humidity: ' + humidityValue;
+                                            },
+                                            label: function(tooltipItem) {
+                                                // Display the time in regular font below the humidity value
+                                                return tooltipItem.label;
                                             },
                                         },
                                     },
+
                                 },
                             });
                         }
