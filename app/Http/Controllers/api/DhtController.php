@@ -44,11 +44,12 @@ class DhtController extends Controller
 
         $batas = DB::table('nilaibatas')->first();
 
-        if (($avgSuhu > $batas->nb_suhu_atas || $avgSuhu < $batas->nb_suhu_bawah) ||
-            (($avgKelembaban > $batas->nb_rh_atas || $avgKelembaban < $batas->nb_rh_bawah) && $batas->status == 1)
+        if ( $batas->status == 1 &&
+            (($avgSuhu > $batas->nb_suhu_atas || $avgSuhu < $batas->nb_suhu_bawah) ||
+                ($avgKelembaban > $batas->nb_rh_atas || $avgKelembaban < $batas->nb_rh_bawah))
         ) {
             DB::table('relay')->update(['state' => 1]);
-        } else if ($batas->status == 1) {
+        } else {
             DB::table('relay')->update(['state' => 0]);
         }
 
