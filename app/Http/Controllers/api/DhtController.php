@@ -52,9 +52,10 @@ class DhtController extends Controller
             DB::table('relay')->update(['state' => 1]);
         } else if (
             $batas->status == 1 &&
-            (($avgSuhu >= $batas->nb_suhu_bawah && $avgSuhu <= $batas->nb_suhu_atas) ||
+            (($avgSuhu >= $batas->nb_suhu_bawah && $avgSuhu <= $batas->nb_suhu_atas) &&
                 ($avgKelembaban >= $batas->nb_rh_bawah && $avgKelembaban <= $batas->nb_rh_atas))
         ) {
+            DB::table('relay')->update(['state' => 0]);
         }
 
         if ($validated['kelembaban'] >= $batas->nb_rh_atas || $validated['kelembaban'] <= $batas->nb_rh_bawah) {
