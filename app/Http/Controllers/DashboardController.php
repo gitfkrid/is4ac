@@ -142,6 +142,17 @@ class DashboardController extends Controller
             DB::table('relay')
                 ->where('id_alat', $alat->id_alat)
                 ->update(['state' => $request->state]);
+            if ($request->state == 0) {
+                DB::table('log_relay')->insert([
+                    'waktu' => now(),
+                    'keterangan' => 'Exhaust Mati',
+                ]);
+            } else if ($request->state == 1) {
+                DB::table('log_relay')->insert([
+                    'waktu' => now(),
+                    'keterangan' => 'Exhaust Hidup',
+                ]);
+            }
 
             return response()->json(['success' => true]);
         } else if ($alat && $batas->status == 1) {
@@ -149,8 +160,7 @@ class DashboardController extends Controller
                 'success' => false,
                 'message' => 'Sedang pada mode otomatis, perubahan tidak dapat dilakukan.'
             ]);
-        }
-        else {
+        } else {
             return response()->json(['success' => false, 'message' => 'Relay not found']);
         }
     }

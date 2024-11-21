@@ -86,7 +86,17 @@ class RelayController extends Controller
             DB::table('relay')
                 ->where('id_alat', $alat->id_alat)
                 ->update(['state' => $state]);
-
+            if ($request->state == 0) {
+                DB::table('log_relay')->insert([
+                    'waktu' => now(),
+                    'keterangan' => 'Exhaust Mati',
+                ]);
+            } else if ($request->state == 1) {
+                DB::table('log_relay')->insert([
+                    'waktu' => now(),
+                    'keterangan' => 'Exhaust Hidup',
+                ]);
+            }
             return response()->json(['success' => true]);
         } else if ($alat && $batas->status == 1) {
             return response()->json([
