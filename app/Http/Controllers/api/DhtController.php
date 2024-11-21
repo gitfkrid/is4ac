@@ -53,7 +53,7 @@ class DhtController extends Controller
 
             // Cek data terakhir pada tabel log_relay untuk hari ini
             $lastLog = DB::table('log_relay')
-                ->whereDate('waktu', now()->toDateString())
+                // ->whereDate('waktu', now()->toDateString())
                 ->orderBy('waktu', 'desc')
                 ->first();
 
@@ -73,7 +73,7 @@ class DhtController extends Controller
 
             // Cek data terakhir pada tabel log_relay untuk hari ini
             $lastLog = DB::table('log_relay')
-                ->whereDate('waktu', now()->toDateString())
+                // ->whereDate('waktu', now()->toDateString())
                 ->orderBy('waktu', 'desc')
                 ->first();
 
