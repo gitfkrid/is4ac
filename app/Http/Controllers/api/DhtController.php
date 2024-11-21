@@ -50,15 +50,43 @@ class DhtController extends Controller
                 ($avgKelembaban > $batas->nb_rh_atas || $avgKelembaban < $batas->nb_rh_bawah))
         ) {
             DB::table('relay')->update(['state' => 1]);
+
+            // Cek data terakhir pada tabel log_relay untuk hari ini
+            $lastLog = DB::table('log_relay')
+                ->whereDate('waktu', now()->toDateString())
+                ->orderBy('waktu', 'desc')
+                ->first();
+
+            if (!$lastLog || $lastLog->keterangan == 'Exhaust Mati') {
+                // Insert log baru untuk Exhaust Hidup
+                DB::table('log_relay')->insert([
+                    'waktu' => now(),
+                    'keterangan' => 'Exhaust Hidup',
+                ]);
+            }
         } else if (
             $batas->status == 1 &&
             (($avgSuhu >= $batas->nb_suhu_bawah && $avgSuhu <= $batas->nb_suhu_atas) &&
                 ($avgKelembaban >= $batas->nb_rh_bawah && $avgKelembaban <= $batas->nb_rh_atas))
         ) {
             DB::table('relay')->update(['state' => 0]);
+
+            // Cek data terakhir pada tabel log_relay untuk hari ini
+            $lastLog = DB::table('log_relay')
+                ->whereDate('waktu', now()->toDateString())
+                ->orderBy('waktu', 'desc')
+                ->first();
+
+            if ($lastLog && $lastLog->keterangan == 'Exhaust Hidup') {
+                // Insert log baru untuk Exhaust Mati
+                DB::table('log_relay')->insert([
+                    'waktu' => now(),
+                    'keterangan' => 'Exhaust Mati',
+                ]);
+            }
         }
 
-        if ($validated['kelembaban'] >= $batas->nb_rh_atas || $validated['kelembaban'] <= $batas->nb_rh_bawah) {
+        if (($validated['kelembaban'] > $batas->nb_rh_atas || $validated['kelembaban'] < $batas->nb_rh_bawah) || ($validated['suhu'] > $batas->nb_suhu_atas || $validated['suhu'] < $batas->nb_suhu_bawah)) {
             DB::table('log')->insert([
                 'id_alat' => $board->id_alat,
                 'suhu' => $validated['suhu'],
