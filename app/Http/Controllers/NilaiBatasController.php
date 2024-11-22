@@ -34,6 +34,20 @@ class NilaiBatasController extends Controller
 
         if ($request->status == 0) {
             DB::table('relay')->update(['state' => 0]);
+
+            // Cek data terakhir pada tabel log_relay untuk hari ini
+            $lastLog = DB::table('log_relay')
+                // ->whereDate('waktu', now()->toDateString())
+                ->orderBy('waktu', 'desc')
+                ->first();
+
+            if ($lastLog && $lastLog->keterangan == 'Exhaust Hidup') {
+                // Insert log baru untuk Exhaust Mati
+                DB::table('log_relay')->insert([
+                    'waktu' => now(),
+                    'keterangan' => 'Exhaust Mati',
+                ]);
+            }
         }
 
         return response()->json(['success' => 'Data berhasil diupdate.']);

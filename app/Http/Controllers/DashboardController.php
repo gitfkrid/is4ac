@@ -143,15 +143,37 @@ class DashboardController extends Controller
                 ->where('id_alat', $alat->id_alat)
                 ->update(['state' => $request->state]);
             if ($request->state == 0) {
-                DB::table('log_relay')->insert([
-                    'waktu' => now(),
-                    'keterangan' => 'Exhaust Mati',
-                ]);
+                DB::table('relay')->update(['state' => 0]);
+
+                // Cek data terakhir pada tabel log_relay untuk hari ini
+                $lastLog = DB::table('log_relay')
+                    // ->whereDate('waktu', now()->toDateString())
+                    ->orderBy('waktu', 'desc')
+                    ->first();
+
+                if ($lastLog && $lastLog->keterangan == 'Exhaust Hidup') {
+                    // Insert log baru untuk Exhaust Mati
+                    DB::table('log_relay')->insert([
+                        'waktu' => now(),
+                        'keterangan' => 'Exhaust Mati',
+                    ]);
+                }
             } else if ($request->state == 1) {
-                DB::table('log_relay')->insert([
-                    'waktu' => now(),
-                    'keterangan' => 'Exhaust Hidup',
-                ]);
+                DB::table('relay')->update(['state' => 1]);
+
+                // Cek data terakhir pada tabel log_relay untuk hari ini
+                $lastLog = DB::table('log_relay')
+                    // ->whereDate('waktu', now()->toDateString())
+                    ->orderBy('waktu', 'desc')
+                    ->first();
+
+                if (!$lastLog || $lastLog->keterangan == 'Exhaust Mati') {
+                    // Insert log baru untuk Exhaust Hidup
+                    DB::table('log_relay')->insert([
+                        'waktu' => now(),
+                        'keterangan' => 'Exhaust Hidup',
+                    ]);
+                }
             }
 
             return response()->json(['success' => true]);
