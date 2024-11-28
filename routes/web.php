@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DetailDashboardController;
+use App\Http\Controllers\LogRelayController;
 use App\Http\Controllers\PenggunaController;
 use App\Http\Controllers\UserLokasiController;
 use App\Http\Controllers\NilaiBatasController;
@@ -49,3 +50,6 @@ Route::get('/dashboard/{uuid}/sensor-data', [DetailDashboardController::class, '
 Route::get('/dashboard/{uuid}/chart', [DetailDashboardController::class, 'getSensorChartData']);
 Route::get('/dashboard/{uuid}/chart/kelembaban', [DetailDashboardController::class, 'getSensorChartHumidity']);
 Route::post('/dashboard/{uuid}/export-data', [DetailDashboardController::class, 'exportData'])->name('export-data');
+
+Route::get('/log/relay', [LogRelayController::class, 'index'])->name('log.index');
+Route::get('/log/relay/data', [LogRelayController::class, 'dataLogRelay'])->name('log.data');

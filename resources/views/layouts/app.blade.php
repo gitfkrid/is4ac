@@ -15,16 +15,24 @@
 
     <!-- Custom fonts for this template -->
     <link href="{{ asset('public/assets/vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
 
     <!-- Custom styles for this template -->
     <link href="{{ asset('public/assets/css/sb-admin-2.min.css') }}" rel="stylesheet">
 
     <!-- Custom styles for this page -->
     <script src="{{ asset('public/assets/js/jquery-3.7.0.js') }}"></script>
-    <script src="{{ asset('public/assets/js/toastr.min.js') }}" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="{{ asset('public/assets/js/toastr.min.js') }}"
+        integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <link href="{{ asset('public/assets/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('public/assets/css/toastr.min.css') }}" integrity="sha512-vKMx8UnXk60zUwyUnUPM3HbQo8QfmNx7+ltw8Pm5zLusl1XIfwcxo8DbWCqMGKaWeNxWA8yrx5v3SaVpMvR3CA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="{{ asset('public/assets/css/toastr.min.css') }}"
+        integrity="sha512-vKMx8UnXk60zUwyUnUPM3HbQo8QfmNx7+ltw8Pm5zLusl1XIfwcxo8DbWCqMGKaWeNxWA8yrx5v3SaVpMvR3CA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- CSS Daterangepicker -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css">
 </head>
 
 <body id="page-top">
@@ -35,7 +43,8 @@
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
                 <div class="sidebar-brand-icon">
-                    <img src="{{ asset('public/assets/img/mdr-login-logo.png') }}" alt="Logo" width="25" height="25">
+                    <img src="{{ asset('public/assets/img/mdr-login-logo.png') }}" alt="Logo" width="25"
+                        height="25">
                 </div>
 
                 <div class="sidebar-brand-text mx-3">MDR - IS4AC</div>
@@ -49,6 +58,13 @@
                 <a class="nav-link" href="{{ route('dashboard') }}">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard</span>
+                </a>
+            </li>
+            <!-- Nav Item - Log Exhaust -->
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('log.index') }}">
+                    <i class="fas fa-database"></i>
+                    <span>Log Exhaust</span>
                 </a>
             </li>
             <!-- Nav Item - Pengguna -->
@@ -101,9 +117,10 @@
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ Auth::user()->name
-                                    }}</span>
-                                <img class="img-profile rounded-circle" src="{{ asset('public/assets/img/mdr-login-logo.png') }}">
+                                <span
+                                    class="mr-2 d-none d-lg-inline text-gray-600 small">{{ Auth::user()->name }}</span>
+                                <img class="img-profile rounded-circle"
+                                    src="{{ asset('public/assets/img/mdr-login-logo.png') }}">
                             </a>
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
@@ -196,6 +213,10 @@
     <!-- Page level custom scripts -->
     <script src="{{ asset('public/assets/js/demo/datatables-demo.js') }}"></script>
     <script src="{{ asset('public/assets/vendor/sweetalert/sweetalert.js') }}"></script>
+
+    <!-- JS Daterangepicker dan Moment.js -->
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/min/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 
     <script>
         function updateTime() {

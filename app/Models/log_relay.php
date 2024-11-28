@@ -19,4 +19,8 @@ class log_relay extends Model
         'mode',
         'keterangan',
     ];
+
+    protected $casts = [
+        'waktu' => 'datetime'
+    ];
 }
