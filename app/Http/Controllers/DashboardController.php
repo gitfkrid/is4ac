@@ -137,6 +137,17 @@ class DashboardController extends Controller
     {
         $alat = DB::table('alat')->where('kode_board', $kode_board)->first();
         $batas = DB::table('nilaibatas')->first();
+        $latestData = DB::table('dht as t1')
+            ->join(DB::raw('(SELECT id_alat, MAX(created_at) as latest FROM dht WHERE created_at >= NOW() - INTERVAL 5 MINUTE GROUP BY id_alat) as t2'), function ($join) {
+                $join->on('t1.id_alat', '=', 't2.id_alat')
+                    ->on('t1.created_at', '=', 't2.latest');
+            })
+            ->select('t1.id_alat', 't1.suhu', 't1.kelembaban', 't1.created_at')
+            ->get();
+
+        // Menghitung rata-rata suhu dan kelembaban dari data yang diambil
+        $avgSuhu = $latestData->avg('suhu');
+        $avgKelembaban = $latestData->avg('kelembaban');
 
         if ($alat && $batas->status == 0) {
             DB::table('relay')
@@ -155,6 +166,9 @@ class DashboardController extends Controller
                     // Insert log baru untuk Exhaust Mati
                     DB::table('log_relay')->insert([
                         'waktu' => now(),
+                        'suhu' => $avgSuhu,
+                        'kelembaban' => $avgKelembaban,
+                        'mode' => $batas->status,
                         'keterangan' => 'Exhaust Mati',
                     ]);
                 }
@@ -171,6 +185,9 @@ class DashboardController extends Controller
                     // Insert log baru untuk Exhaust Hidup
                     DB::table('log_relay')->insert([
                         'waktu' => now(),
+                        'suhu' => $avgSuhu,
+                        'kelembaban' => $avgKelembaban,
+                        'mode' => $batas->status,
                         'keterangan' => 'Exhaust Hidup',
                     ]);
                 }

@@ -61,6 +61,9 @@ class DhtController extends Controller
                 // Insert log baru untuk Exhaust Hidup
                 DB::table('log_relay')->insert([
                     'waktu' => now(),
+                    'suhu' => $avgSuhu,
+                    'kelembaban' => $avgKelembaban,
+                    'mode' => $batas->status,
                     'keterangan' => 'Exhaust Hidup',
                 ]);
             }
@@ -81,6 +84,9 @@ class DhtController extends Controller
                 // Insert log baru untuk Exhaust Mati
                 DB::table('log_relay')->insert([
                     'waktu' => now(),
+                    'suhu' => $avgSuhu,
+                    'kelembaban' => $avgKelembaban,
+                    'mode' => $batas->status,
                     'keterangan' => 'Exhaust Mati',
                 ]);
             }

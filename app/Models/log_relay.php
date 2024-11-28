@@ -14,6 +14,9 @@ class log_relay extends Model
 
     protected $fillable = [
         'waktu',
+        'suhu',
+        'kelembaban',
+        'mode',
         'keterangan',
     ];
 }

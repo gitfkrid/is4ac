@@ -40,11 +40,25 @@ class NilaiBatasController extends Controller
                 // ->whereDate('waktu', now()->toDateString())
                 ->orderBy('waktu', 'desc')
                 ->first();
+            $latestData = DB::table('dht as t1')
+                ->join(DB::raw('(SELECT id_alat, MAX(created_at) as latest FROM dht WHERE created_at >= NOW() - INTERVAL 5 MINUTE GROUP BY id_alat) as t2'), function ($join) {
+                    $join->on('t1.id_alat', '=', 't2.id_alat')
+                        ->on('t1.created_at', '=', 't2.latest');
+                })
+                ->select('t1.id_alat', 't1.suhu', 't1.kelembaban', 't1.created_at')
+                ->get();
+
+            // Menghitung rata-rata suhu dan kelembaban dari data yang diambil
+            $avgSuhu = $latestData->avg('suhu');
+            $avgKelembaban = $latestData->avg('kelembaban');
 
             if ($lastLog && $lastLog->keterangan == 'Exhaust Hidup') {
                 // Insert log baru untuk Exhaust Mati
                 DB::table('log_relay')->insert([
                     'waktu' => now(),
+                    'suhu' => $avgSuhu,
+                    'kelembaban' => $avgKelembaban,
+                    'mode' => $request->status,
                     'keterangan' => 'Exhaust Mati',
                 ]);
             }
