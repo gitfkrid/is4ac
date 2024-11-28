@@ -125,12 +125,7 @@
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
                     @yield('headcontent')
-
-                    @yield('dashboard')
-                    <div class="card shadow mb-4">
-                        @yield('content')
-                    </div>
-
+                    @yield('content')
                 </div>
                 <!-- /.container-fluid -->
 

@@ -209,9 +209,13 @@ class DetailDashboardController extends Controller
             return response()->json(['error' => 'Jenis alat tidak dikenali'], 400);
         }
 
+        $startDateFile = \Carbon\Carbon::parse($startDate)->format('Y-m-d'); // Format YYYY-MM-DD
+        $endDateFile = \Carbon\Carbon::parse($endDate)->format('Y-m-d'); // Format YYYY-MM-DD
+        $filename = "sensor_data_{$startDateFile}_to_{$endDateFile}.csv"; // Nama file berdasarkan rentang tanggal
+
         $headers = [
             "Content-type" => "text/csv",
-            "Content-Disposition" => "attachment; filename=sensor_data.csv",
+            "Content-Disposition" => "attachment; filename={$filename}",
             "Pragma" => "no-cache",
             "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
             "Expires" => "0"

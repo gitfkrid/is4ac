@@ -15,24 +15,26 @@
 @endsection
 
 @section('content')
-    <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold text-primary">Tabel Log Exhaust IS4AC</h6>
-    </div>
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-bordered" id="table" width="100%" cellspacing="0">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Rata-rata Suhu</th>
-                        <th>Rata-rata Kelembaban</th>
-                        <th>Mode</th>
-                        <th>Waktu</th>
-                        <th>Keterangan</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Tabel Log Exhaust IS4AC</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="table" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Rata-rata Suhu</th>
+                            <th>Rata-rata Kelembaban</th>
+                            <th>Mode</th>
+                            <th>Waktu</th>
+                            <th>Keterangan</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
     </div>
 @endsection
@@ -52,8 +54,10 @@
                     "type": "GET",
                     "data": function(d) {
                         // Ambil tanggal dari input hidden, default hari ini jika tidak dipilih
-                        d.start_date = $('#start_date').val() || moment().format('YYYY-MM-DD'); // Default hari ini
-                        d.end_date = $('#end_date').val() || moment().format('YYYY-MM-DD'); // Default hari ini
+                        d.start_date = $('#start_date').val() || moment().format(
+                            'YYYY-MM-DD'); // Default hari ini
+                        d.end_date = $('#end_date').val() || moment().format(
+                            'YYYY-MM-DD'); // Default hari ini
                     }
                 }
             });
