@@ -51,5 +51,5 @@ Route::get('/dashboard/{uuid}/chart', [DetailDashboardController::class, 'getSen
 Route::get('/dashboard/{uuid}/chart/kelembaban', [DetailDashboardController::class, 'getSensorChartHumidity']);
 Route::post('/dashboard/{uuid}/export-data', [DetailDashboardController::class, 'exportData'])->name('export-data');
 
-Route::get('/log/relay', [LogRelayController::class, 'index'])->name('log.index');
+Route::get('/log/relay', [LogRelayController::class, 'index'])->middleware('auth')->name('log.index');
 Route::get('/log/relay/data', [LogRelayController::class, 'dataLogRelay'])->name('log.data');

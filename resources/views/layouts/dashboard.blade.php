@@ -58,6 +58,12 @@
                     <span>Dashboard</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('log.index') }}">
+                    <i class="fas fa-database"></i>
+                    <span>Log Exhaust</span>
+                </a>
+            </li>
             <!-- Nav Item - Pengguna -->
             <li class="nav-item">
                 <a class="nav-link" href="{{ route('pengguna.index') }}">
