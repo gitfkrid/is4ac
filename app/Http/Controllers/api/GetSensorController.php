@@ -32,14 +32,16 @@ class GetSensorController extends Controller
                 WHERE (id_alat, created_at) IN (
                     SELECT id_alat, MAX(created_at)
                     FROM dht
+                    WHERE TIMESTAMPDIFF(MINUTE, created_at, NOW()) <= 5
                     GROUP BY id_alat
                 )) AS latest_dht ON latest_dht.id_alat = alat.id_alat
             LEFT JOIN
-                (SELECT id_alat,fosfin, created_at
+                (SELECT id_alat, fosfin, created_at
                 FROM fosfin
                 WHERE (id_alat, created_at) IN (
                     SELECT id_alat, MAX(created_at)
                     FROM fosfin
+                    WHERE TIMESTAMPDIFF(MINUTE, created_at, NOW()) <= 5
                     GROUP BY id_alat
                 )) AS latest_fosfin ON latest_fosfin.id_alat = alat.id_alat
             LEFT JOIN
