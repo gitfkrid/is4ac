@@ -154,7 +154,6 @@ class DashboardController extends Controller
                 ->where('id_alat', $alat->id_alat)
                 ->update(['state' => $request->state]);
             if ($request->state == 0) {
-                DB::table('relay')->update(['state' => 0]);
 
                 // Cek data terakhir pada tabel log_relay untuk hari ini
                 $lastLog = DB::table('log_relay')
@@ -173,7 +172,6 @@ class DashboardController extends Controller
                     ]);
                 }
             } else if ($request->state == 1) {
-                DB::table('relay')->update(['state' => 1]);
 
                 // Cek data terakhir pada tabel log_relay untuk hari ini
                 $lastLog = DB::table('log_relay')
