@@ -130,20 +130,16 @@ class DetailDashboardController extends Controller
                 $startDateTime = Carbon::parse("$date $time");
                 $endDateTime = $startDateTime->copy()->endOfDay();
     
-                $query->whereBetween('updated_at', [$startDateTime, $endDateTime])
-                ->limit(60);
+                $query->whereBetween('updated_at', [$startDateTime, $endDateTime]);
             } catch (\Exception $e) {
                 return response()->json(['error' => 'Format tanggal atau waktu tidak valid'], 400);
             }
         }
-
-            $query->orderBy('updated_at', 'desc');
     
-            if (!$date || !$time) {
-                $query->limit(60);
-            }
-        
-            $data = $query->get(['updated_at', $valueField]);
+        // Ambil 60 data terbaru
+        $data = $query->orderBy('updated_at', 'asc')
+            ->limit(60)
+            ->get(['updated_at', $valueField]);
     
         if ($data->isEmpty()) {
             return response()->json(['error' => 'Data sensor tidak tersedia'], 404);
@@ -187,8 +183,7 @@ class DetailDashboardController extends Controller
             $startDateTime = Carbon::parse("$date $time");
             $endDateTime = $startDateTime->copy()->endOfDay();
     
-            $query->whereBetween('updated_at', [$startDateTime, $endDateTime])
-            ->limit(60);
+            $query->whereBetween('updated_at', [$startDateTime, $endDateTime]);
         }
     
         // Tambahkan orderBy dan limit untuk query
