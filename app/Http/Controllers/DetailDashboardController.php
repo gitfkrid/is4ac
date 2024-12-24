@@ -186,14 +186,9 @@ class DetailDashboardController extends Controller
             $query->whereBetween('updated_at', [$startDateTime, $endDateTime]);
         }
     
-        // Tambahkan orderBy dan limit untuk query
-        $query->orderBy('updated_at', 'desc');
-    
-        if (!$date || !$time) {
-            $query->limit(60);
-        }
-    
-        $data = $query->get(['kelembaban', 'updated_at']);
+        $data = $query->orderBy('updated_at', 'desc')
+        ->limit(60)
+        ->get(['kelembaban', 'updated_at']);
     
         if ($data->isEmpty()) {
             return response()->json(['error' => 'Data sensor tidak tersedia'], 404);
