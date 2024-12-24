@@ -102,7 +102,8 @@ class DetailDashboardController extends Controller
         return response()->json($sensorArray);
     }
 
-    public function getSensorChartData(Request $request, $uuid) {
+    public function getSensorChartData(Request $request, $uuid)
+    {
         $alat = Alat::where('uuid', $uuid)->first();
     
         if (!$alat) {
@@ -120,6 +121,9 @@ class DetailDashboardController extends Controller
             return response()->json(['error' => 'Jenis alat tidak valid'], 400);
         }
     
+        // Flag untuk mengetahui apakah ada filter
+        $isFiltered = false;
+    
         // Filter berdasarkan date dan time jika diberikan
         if ($request->has('date') && $request->has('time')) {
             $date = $request->input('date');
@@ -131,21 +135,19 @@ class DetailDashboardController extends Controller
                 $endDateTime = $startDateTime->copy()->endOfDay();
     
                 $query->whereBetween('updated_at', [$startDateTime, $endDateTime]);
+                $isFiltered = true; // Tandai bahwa data difilter
             } catch (\Exception $e) {
                 return response()->json(['error' => 'Format tanggal atau waktu tidak valid'], 400);
             }
         }
     
-        // Ambil 60 data terbaru
-        if (!$date || !$time) {
-            $data = $query->orderBy('updated_at', 'desc')
+        // Tentukan urutan data berdasarkan filter
+        $orderDirection = $isFiltered ? 'asc' : 'desc';
+    
+        // Ambil 60 data terbaru atau sesuai filter
+        $data = $query->orderBy('updated_at', $orderDirection)
             ->limit(60)
             ->get(['updated_at', $valueField]);
-        } else if ($date || $time) {
-            $data = $query->orderBy('updated_at', 'asc')
-            ->limit(60)
-            ->get(['updated_at', $valueField]);
-        }
     
         if ($data->isEmpty()) {
             return response()->json(['error' => 'Data sensor tidak tersedia'], 404);
@@ -162,13 +164,14 @@ class DetailDashboardController extends Controller
             $formattedData['values'][] = $entry->$valueField;
         }
     
-        $formattedData['labels'] = array_reverse($formattedData['labels']);
-        $formattedData['values'] = array_reverse($formattedData['values']);
+        // Jika tanpa filter, data tetap dibalik (karena default 'desc')
+        if (!$isFiltered) {
+            $formattedData['labels'] = array_reverse($formattedData['labels']);
+            $formattedData['values'] = array_reverse($formattedData['values']);
+        }
     
         return response()->json($formattedData);
     }
-    
-    
 
     public function getSensorChartHumidity($uuid)
     {
