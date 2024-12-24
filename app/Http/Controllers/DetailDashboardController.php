@@ -187,18 +187,30 @@ class DetailDashboardController extends Controller
     
         $query = Dht::where('id_alat', $alat->id_alat);
     
+        // Flag untuk mengetahui apakah ada filter
+        $isFiltered = false;
+    
         // Jika ada filter date dan time, tambahkan kondisi untuk filter
         if ($date && $time) {
-            $startDateTime = Carbon::parse("$date $time");
-            $endDateTime = $startDateTime->copy()->endOfDay();
+            try {
+                $startDateTime = Carbon::parse("$date $time");
+                $endDateTime = $startDateTime->copy()->endOfDay();
     
-            $query->whereBetween('updated_at', [$startDateTime, $endDateTime]);
+                $query->whereBetween('updated_at', [$startDateTime, $endDateTime]);
+                $isFiltered = true; // Tandai bahwa data difilter
+            } catch (\Exception $e) {
+                return response()->json(['error' => 'Format tanggal atau waktu tidak valid'], 400);
+            }
         }
     
-        // Tambahkan orderBy dan limit untuk query
-        $query->orderBy('updated_at', 'desc');
+        // Tentukan urutan data berdasarkan filter
+        $orderDirection = $isFiltered ? 'asc' : 'desc';
     
-        if (!$date || !$time) {
+        // Ambil data dengan urutan sesuai filter
+        $query->orderBy('updated_at', $orderDirection);
+    
+        // Jika tidak difilter, ambil 60 data terbaru
+        if (!$isFiltered) {
             $query->limit(60);
         }
     
@@ -219,11 +231,15 @@ class DetailDashboardController extends Controller
             $formattedData['values'][] = $entry->kelembaban;
         }
     
-        $formattedData['labels'] = array_reverse($formattedData['labels']);
-        $formattedData['values'] = array_reverse($formattedData['values']);
+        // Jika tanpa filter, data tetap dibalik (karena default 'desc')
+        if (!$isFiltered) {
+            $formattedData['labels'] = array_reverse($formattedData['labels']);
+            $formattedData['values'] = array_reverse($formattedData['values']);
+        }
     
         return response()->json($formattedData);
     }
+    
 
     public function exportData(Request $request, $uuid)
     {
