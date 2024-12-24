@@ -102,7 +102,8 @@ class DetailDashboardController extends Controller
         return response()->json($sensorArray);
     }
 
-    public function getSensorChartData(Request $request, $uuid) {
+    public function getSensorChartData(Request $request, $uuid)
+    {
         $alat = Alat::where('uuid', $uuid)->first();
     
         if (!$alat) {
@@ -112,8 +113,10 @@ class DetailDashboardController extends Controller
         // Pilih model data sesuai jenis alat
         if ($alat->id_jenis_alat == 1) { // PH3
             $query = Fosfin::where('id_alat', $alat->id_alat);
+            $column = 'fosfin'; // Kolom yang dipilih untuk PH3
         } elseif ($alat->id_jenis_alat == 2) { // DHT
             $query = Dht::where('id_alat', $alat->id_alat);
+            $column = 'suhu'; // Kolom yang dipilih untuk DHT
         } else {
             return response()->json(['error' => 'Jenis alat tidak valid'], 400);
         }
@@ -138,7 +141,7 @@ class DetailDashboardController extends Controller
         // Ambil 60 data terbaru
         $data = $query->orderBy('updated_at', 'desc')
             ->limit(60)
-            ->get(['updated_at', $alat->id_jenis_alat == 1 ? 'fosfin' : 'suhu']);
+            ->get(['updated_at', $column]); // Pilih kolom sesuai jenis alat
     
         if ($data->isEmpty()) {
             return response()->json(['error' => 'Data sensor tidak tersedia'], 404);
@@ -152,7 +155,7 @@ class DetailDashboardController extends Controller
     
         foreach ($data as $entry) {
             $formattedData['labels'][] = $entry->updated_at->format('d-m H:i');
-            $formattedData['values'][] = $alat->id_jenis_alat == 1 ? $entry->fosfin : $entry->suhu;
+            $formattedData['values'][] = $entry->$column; // Ambil nilai sesuai kolom
         }
     
         $formattedData['labels'] = array_reverse($formattedData['labels']);
@@ -160,6 +163,7 @@ class DetailDashboardController extends Controller
     
         return response()->json($formattedData);
     }
+    
 
     public function getSensorChartHumidity($uuid)
     {
