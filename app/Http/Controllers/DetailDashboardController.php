@@ -137,9 +137,15 @@ class DetailDashboardController extends Controller
         }
     
         // Ambil 60 data terbaru
-        $data = $query->orderBy('updated_at', 'asc')
+        if (!$date || !$time) {
+            $data = $query->orderBy('updated_at', 'desc')
             ->limit(60)
             ->get(['updated_at', $valueField]);
+        } else if ($date || $time) {
+            $data = $query->orderBy('updated_at', 'asc')
+            ->limit(60)
+            ->get(['updated_at', $valueField]);
+        }
     
         if ($data->isEmpty()) {
             return response()->json(['error' => 'Data sensor tidak tersedia'], 404);
