@@ -81,30 +81,39 @@ class RelayController extends Controller
         $alat = DB::table('alat')->where('kode_board', $kode_board)->first();
         $batas = DB::table('nilaibatas')->first();
 
-        // Jika relay ditemukan, lakukan update
+        // Ambil data terbaru suhu dan kelembaban
+        $latestData = DB::table('dht as t1')
+            ->join(DB::raw('(SELECT id_alat, MAX(created_at) as latest FROM dht WHERE created_at >= NOW() - INTERVAL 5 MINUTE GROUP BY id_alat) as t2'), function ($join) {
+                $join->on('t1.id_alat', '=', 't2.id_alat')
+                    ->on('t1.created_at', '=', 't2.latest');
+            })
+            ->select('t1.id_alat', 't1.suhu', 't1.kelembaban', 't1.created_at')
+            ->get();
+
+        $avgSuhu = $latestData->avg('suhu');
+        $avgKelembaban = $latestData->avg('kelembaban');
+
         if ($alat && $batas->status == 0) {
-            DB::table('relay')
-                ->where('id_alat', $alat->id_alat)
-                ->update(['state' => $state]);
-            if ($request->state == 0) {
-                DB::table('log_relay')->insert([
-                    'waktu' => now(),
-                    'keterangan' => 'Exhaust Mati',
-                ]);
-            } else if ($request->state == 1) {
-                DB::table('log_relay')->insert([
-                    'waktu' => now(),
-                    'keterangan' => 'Exhaust Hidup',
-                ]);
-            }
+            DB::table('relay')->where('id_alat', $alat->id_alat)->update(['state' => $state]);
+
+            $keterangan = $state == 0 ? 'Exhaust Mati' : 'Exhaust Hidup';
+
+            // Insert log relay
+            DB::table('log_relay')->insert([
+                'waktu' => now(),
+                'suhu' => $avgSuhu,
+                'kelembaban' => $avgKelembaban,
+                'mode' => $batas->status,
+                'keterangan' => $keterangan,
+            ]);
+
             return response()->json(['success' => true]);
-        } else if ($alat && $batas->status == 1) {
+        } elseif ($alat && $batas->status == 1) {
             return response()->json([
                 'success' => false,
                 'message' => 'Sedang pada mode otomatis, perubahan tidak dapat dilakukan.'
             ]);
         } else {
-            // Jika relay tidak ditemukan, return error
             return response()->json(['success' => false, 'message' => 'Relay not found']);
         }
     }

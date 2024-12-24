@@ -115,6 +115,13 @@
 @endsection
 
 @section('content')
+    <div class="d-flex align-items-center mb-4">
+        <input type="date" id="selectedDate" class="form-control mr-2" placeholder="Select Date">
+        <input type="time" id="selectedTime" class="form-control mr-2" placeholder="Select Time">
+        <button class="btn btn-primary" id="filterData">
+            <i class="fa fa-filter"></i>
+        </button>
+    </div>
     @if ($alat->id_jenis_alat == 1)
         <!-- Area Chart -->
         <div class="card shadow mb-4">
@@ -180,10 +187,12 @@
             });
         </script>
     @endif
+    <script src="{{ asset('public/assets/vendor/chart.js/Chart.js') }}"></script>
     <script>
         $(document).ready(function() {
             $('#exportData').on('click', function() {
                 $('#exportModal').modal('show');
+                $('.modal-titles').text('Export Data');
                 $('#exportModal form')[0].reset();
             });
 
@@ -224,12 +233,7 @@
                 });
             });
         });
-    </script>
 
-    <script src="{{ asset('public/assets/vendor/chart.js/Chart.min.js') }}"></script>
-
-
-    <script>
         var myLineChart, myHumiChart;
 
         function showChart() {
@@ -262,14 +266,17 @@
                 return s.join(dec);
             }
 
-            // Function to fetch and update the Suhu/Fosfin chart
-            function fetchAndUpdateChart() {
+            function fetchAndUpdateChart(date = '', time = '') {
                 var uuid = "{{ $alat->uuid }}";
-                fetch(uuid + "/chart")
+                var url = uuid + "/chart";
+                if (date && time) {
+                    url += `?date=${date}&time=${time}`;
+                }
+                fetch(url)
                     .then(response => response.json())
                     .then(data => {
                         var ctx1 = document.getElementById("areaChart").getContext("2d");
-                        if (myLineChart) {
+                        if (typeof myLineChart !== "undefined") {
                             myLineChart.data.labels = data.labels;
                             myLineChart.data.datasets[0].data = data.values;
                             myLineChart.update();
@@ -279,7 +286,7 @@
                                 data: {
                                     labels: data.labels,
                                     datasets: [{
-                                        label: "Sensor Value",
+                                        label: "Value",
                                         lineTension: 0.3,
                                         backgroundColor: "rgba(78, 115, 223, 0.05)",
                                         borderColor: "rgba(78, 115, 223, 1)",
@@ -370,14 +377,17 @@
                     .catch(error => console.error("Error fetching sensor data:", error));
             }
 
-            // Function to fetch and update the Kelembaban chart
-            function fetchAndUpdateHumiChart() {
+            function fetchAndUpdateHumiChart(date = '', time = '') {
                 var uuid = "{{ $alat->uuid }}";
-                fetch(uuid + "/chart/kelembaban")
+                var url = uuid + "/chart/kelembaban";
+                if (date && time) {
+                    url += `?date=${date}&time=${time}`;
+                }
+                fetch(url)
                     .then(response => response.json())
                     .then(data => {
                         var ctx2 = document.getElementById("areaChartHumi").getContext("2d");
-                        if (myHumiChart) {
+                        if (typeof myHumiChart !== "undefined") {
                             myHumiChart.data.labels = data.labels;
                             myHumiChart.data.datasets[0].data = data.values;
                             myHumiChart.update();
@@ -471,7 +481,6 @@
                                             },
                                         },
                                     },
-
                                 },
                             });
                         }
@@ -482,9 +491,23 @@
             // Fetch data and initialize charts
             fetchAndUpdateChart();
             fetchAndUpdateHumiChart();
-            setInterval(fetchAndUpdateChart, 5000);
-            setInterval(fetchAndUpdateHumiChart, 5000);
+            // setInterval(fetchAndUpdateChart, 5000);
+            // setInterval(fetchAndUpdateHumiChart, 5000);
+
+            document.getElementById('filterData').addEventListener('click', function() {
+                const selectedDate = document.getElementById('selectedDate').value;
+                const selectedTime = document.getElementById('selectedTime').value;
+
+                if (!selectedDate || !selectedTime) {
+                    alert('Pilih tanggal dan waktu terlebih dahulu!');
+                    return;
+                }
+
+                fetchAndUpdateChart(selectedDate, selectedTime);
+                fetchAndUpdateHumiChart(selectedDate, selectedTime);
+            });
         }
+
         showChart();
     </script>
 

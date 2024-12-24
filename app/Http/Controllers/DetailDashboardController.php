@@ -102,80 +102,114 @@ class DetailDashboardController extends Controller
         return response()->json($sensorArray);
     }
 
-    public function getSensorChartData($uuid)
-    {
+    public function getSensorChartData(Request $request, $uuid) {
         $alat = Alat::where('uuid', $uuid)->first();
-
+    
         if (!$alat) {
             return response()->json(['error' => 'Alat tidak ditemukan'], 404);
         }
-
-        $data = [];
-
+    
+        // Pilih model data sesuai jenis alat
         if ($alat->id_jenis_alat == 1) { // PH3
-            $data = Fosfin::where('id_alat', $alat->id_alat)
-                ->orderBy('updated_at', 'desc')
-                ->limit(60)
-                ->get(['fosfin', 'updated_at']);
+            $query = Fosfin::where('id_alat', $alat->id_alat);
         } elseif ($alat->id_jenis_alat == 2) { // DHT
-            $data = Dht::where('id_alat', $alat->id_alat)
-                ->orderBy('updated_at', 'desc')
-                ->limit(60)
-                ->get(['suhu', 'updated_at']);
+            $query = Dht::where('id_alat', $alat->id_alat);
+        } else {
+            return response()->json(['error' => 'Jenis alat tidak valid'], 400);
         }
-
+    
+        // Filter berdasarkan date dan time jika diberikan
+        if ($request->has('date') && $request->has('time')) {
+            $date = $request->input('date');
+            $time = $request->input('time');
+    
+            try {
+                // Kombinasikan date dan time untuk mendapatkan waktu mulai
+                $startDateTime = Carbon::createFromFormat('Y-m-d H:i:s', "$date $time:00");
+                $endDateTime = Carbon::createFromFormat('Y-m-d', $date)->endOfDay(); // Akhir hari
+    
+                $query->where('updated_at', '>=', $startDateTime)
+                      ->where('updated_at', '<=', $endDateTime);
+            } catch (\Exception $e) {
+                return response()->json(['error' => 'Format tanggal atau waktu tidak valid'], 400);
+            }
+        }
+    
+        // Ambil 60 data terbaru
+        $data = $query->orderBy('updated_at', 'desc')
+            ->limit(60)
+            ->get(['updated_at', $alat->id_jenis_alat == 1 ? 'fosfin' : 'suhu']);
+    
         if ($data->isEmpty()) {
             return response()->json(['error' => 'Data sensor tidak tersedia'], 404);
         }
-
+    
         // Format data untuk chart
         $formattedData = [
             'labels' => [],
             'values' => []
         ];
-
+    
         foreach ($data as $entry) {
-            $formattedData['labels'][] = $entry->updated_at->format('H:i');
+            $formattedData['labels'][] = $entry->updated_at->format('d-m H:i');
             $formattedData['values'][] = $alat->id_jenis_alat == 1 ? $entry->fosfin : $entry->suhu;
         }
-
+    
         $formattedData['labels'] = array_reverse($formattedData['labels']);
         $formattedData['values'] = array_reverse($formattedData['values']);
-
+    
         return response()->json($formattedData);
     }
 
     public function getSensorChartHumidity($uuid)
     {
         $alat = Alat::where('uuid', $uuid)->first();
-
+    
         if (!$alat) {
             return response()->json(['error' => 'Alat tidak ditemukan'], 404);
         }
-
-        $data = Dht::where('id_alat', $alat->id_alat)
-            ->orderBy('updated_at', 'desc')
-            ->limit(60)
-            ->get(['kelembaban', 'updated_at']);
-
+    
+        // Ambil query parameter date dan time
+        $date = request('date');
+        $time = request('time');
+    
+        $query = Dht::where('id_alat', $alat->id_alat);
+    
+        // Jika ada filter date dan time, tambahkan kondisi untuk filter
+        if ($date && $time) {
+            $startDateTime = Carbon::parse("$date $time");
+            $endDateTime = $startDateTime->copy()->endOfDay();
+    
+            $query->whereBetween('updated_at', [$startDateTime, $endDateTime]);
+        }
+    
+        // Tambahkan orderBy dan limit untuk query
+        $query->orderBy('updated_at', 'desc');
+    
+        if (!$date || !$time) {
+            $query->limit(60);
+        }
+    
+        $data = $query->get(['kelembaban', 'updated_at']);
+    
         if ($data->isEmpty()) {
             return response()->json(['error' => 'Data sensor tidak tersedia'], 404);
         }
-
+    
         // Format data untuk chart
         $formattedData = [
             'labels' => [],
             'values' => []
         ];
-
+    
         foreach ($data as $entry) {
-            $formattedData['labels'][] = $entry->updated_at->format('H:i');
+            $formattedData['labels'][] = $entry->updated_at->format('d-m H:i');
             $formattedData['values'][] = $entry->kelembaban;
         }
-
+    
         $formattedData['labels'] = array_reverse($formattedData['labels']);
         $formattedData['values'] = array_reverse($formattedData['values']);
-
+    
         return response()->json($formattedData);
     }
 
