@@ -206,13 +206,8 @@ class DetailDashboardController extends Controller
         // Tentukan urutan data berdasarkan filter
         $orderDirection = $isFiltered ? 'asc' : 'desc';
     
-        // Ambil data dengan urutan sesuai filter
-        $query->orderBy('updated_at', $orderDirection);
-    
-        // Jika tidak difilter, ambil 60 data terbaru
-        if (!$isFiltered) {
-            $query->limit(60);
-        }
+        // Ambil data dengan urutan sesuai filter dan limit 60
+        $query->orderBy('updated_at', $orderDirection)->limit(60);
     
         $data = $query->get(['kelembaban', 'updated_at']);
     
@@ -238,8 +233,7 @@ class DetailDashboardController extends Controller
         }
     
         return response()->json($formattedData);
-    }
-    
+    }    
 
     public function exportData(Request $request, $uuid)
     {
