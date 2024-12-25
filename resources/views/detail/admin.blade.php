@@ -362,7 +362,6 @@
 
                 chartInterval = setInterval(() => fetchAndUpdateChart(), 5000);
                 humiChartInterval = setInterval(() => fetchAndUpdateHumiChart(), 5000);
-                console.log("reloaded");
             }
 
             function stopIntervals() {
