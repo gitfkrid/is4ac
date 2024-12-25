@@ -116,8 +116,8 @@
 
 @section('content')
     <div class="d-flex align-items-center mb-4">
-        <input type="date" id="selectedDate" class="form-control mr-2" placeholder="Select Date">
-        <input type="time" id="selectedTime" class="form-control mr-2" placeholder="Select Time">
+        <input type="date" id="selectedDateStart" class="form-control mr-2" placeholder="Select Date">
+        <input type="date" id="selectedDateEnd" class="form-control mr-2" placeholder="Select Date">
         <button class="btn btn-primary" id="filterData">
             <i class="fa fa-filter"></i>
         </button>
