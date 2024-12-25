@@ -124,13 +124,12 @@ class DetailDashboardController extends Controller
         // Flag untuk mengetahui apakah ada filter
         $isFiltered = false;
     
-        // Filter berdasarkan date dan time jika diberikan
+        // Filter berdasarkan rentang tanggal jika diberikan
         if ($request->has('dateS') && $request->has('dateE')) {
             $dateStart = $request->input('dateS');
             $dateEnd = $request->input('dateE');
         
             try {
-                // Kombinasikan tanggal dengan waktu
                 $startDateTime = Carbon::parse($dateStart)->startOfDay(); // 00:00:00
                 $endDateTime = Carbon::parse($dateEnd)->endOfDay(); // 23:59:59
         
@@ -144,9 +143,12 @@ class DetailDashboardController extends Controller
         // Tentukan urutan data berdasarkan filter
         $orderDirection = $isFiltered ? 'asc' : 'desc';
     
-        // Ambil 60 data terbaru atau sesuai filter
+        // Jika data tidak difilter, batasi ke 60 data terbaru
+        if (!$isFiltered) {
+            $query->limit(60);
+        }
+    
         $data = $query->orderBy('updated_at', $orderDirection)
-            ->limit(60)
             ->get(['updated_at', $valueField]);
     
         if ($data->isEmpty()) {
@@ -172,6 +174,7 @@ class DetailDashboardController extends Controller
     
         return response()->json($formattedData);
     }
+    
 
     public function getSensorChartHumidity($uuid)
     {
