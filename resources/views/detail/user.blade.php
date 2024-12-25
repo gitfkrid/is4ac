@@ -245,7 +245,6 @@
 
                 chartInterval = setInterval(() => fetchAndUpdateChart(), 5000);
                 humiChartInterval = setInterval(() => fetchAndUpdateHumiChart(), 5000);
-                console.log("reloaded");
             }
 
             function stopIntervals() {
@@ -288,11 +287,11 @@
                 return s.join(dec);
             }
 
-            function fetchAndUpdateChart(date = '', time = '') {
+            function fetchAndUpdateChart(dateS = '', dateE = '') {
                 var uuid = "{{ $alat->uuid }}";
                 var url = uuid + "/chart";
-                if (date && time) {
-                    url += `?date=${date}&time=${time}`;
+                if (dateS && dateE) {
+                    url += `?dateS=${dateS}&dateE=${dateE}`;
                 }
                 fetch(url)
                     .then(response => response.json())
@@ -343,13 +342,13 @@
                                                 drawBorder: false,
                                             },
                                             ticks: {
-                                                maxTicksLimit: 7,
+                                                maxTicksLimit: 10,
                                             },
                                         }],
                                         yAxes: [{
                                             ticks: {
-                                                maxTicksLimit: 5,
-                                                padding: 10,
+                                                maxTicksLimit: 6,
+                                                padding: 7,
                                                 callback: function(value, index, values) {
                                                     return number_format(value);
                                                 },
@@ -399,11 +398,11 @@
                     .catch(error => console.error("Error fetching sensor data:", error));
             }
 
-            function fetchAndUpdateHumiChart(date = '', time = '') {
+            function fetchAndUpdateHumiChart(dateS = '', dateE = '') {
                 var uuid = "{{ $alat->uuid }}";
                 var url = uuid + "/chart/kelembaban";
-                if (date && time) {
-                    url += `?date=${date}&time=${time}`;
+                if (dateS && dateE) {
+                    url += `?dateS=${dateS}&dateE=${dateE}`;
                 }
                 fetch(url)
                     .then(response => response.json())
@@ -454,13 +453,13 @@
                                                 drawBorder: false,
                                             },
                                             ticks: {
-                                                maxTicksLimit: 7,
+                                                maxTicksLimit: 10,
                                             },
                                         }],
                                         yAxes: [{
                                             ticks: {
-                                                maxTicksLimit: 5,
-                                                padding: 10,
+                                                maxTicksLimit: 6,
+                                                padding: 7,
                                                 callback: function(value, index, values) {
                                                     return number_format(value);
                                                 },
@@ -516,18 +515,18 @@
             startIntervals();
 
             document.getElementById('filterData').addEventListener('click', function() {
-                const selectedDate = document.getElementById('selectedDate').value;
-                const selectedTime = document.getElementById('selectedTime').value;
+                const selectedDateStart = document.getElementById('selectedDateStart').value;
+                const selectedDateEnd = document.getElementById('selectedDateEnd').value;
 
-                if (!selectedDate || !selectedTime) {
+                if (!selectedDateStart || !selectedDateEnd) {
                     alert('Pilih tanggal dan waktu terlebih dahulu!');
                     return;
                 }
 
                 stopIntervals();
 
-                fetchAndUpdateChart(selectedDate, selectedTime);
-                fetchAndUpdateHumiChart(selectedDate, selectedTime);
+                fetchAndUpdateChart(selectedDateStart, selectedDateEnd);
+                fetchAndUpdateHumiChart(selectedDateStart, selectedDateEnd);
             });
         }
 

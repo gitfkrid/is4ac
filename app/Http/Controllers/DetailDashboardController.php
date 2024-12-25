@@ -125,19 +125,19 @@ class DetailDashboardController extends Controller
         $isFiltered = false;
     
         // Filter berdasarkan date dan time jika diberikan
-        if ($request->has('date') && $request->has('time')) {
-            $date = $request->input('date');
-            $time = $request->input('time');
-    
+        if ($request->has('dateS') && $request->has('dateE')) {
+            $dateStart = $request->input('dateS');
+            $dateEnd = $request->input('dateE');
+        
             try {
-                // Kombinasikan date dan time untuk mendapatkan waktu mulai
-                $startDateTime = Carbon::parse("$date $time");
-                $endDateTime = $startDateTime->copy()->endOfDay();
-    
+                // Kombinasikan tanggal dengan waktu
+                $startDateTime = Carbon::parse($dateStart)->startOfDay(); // 00:00:00
+                $endDateTime = Carbon::parse($dateEnd)->endOfDay(); // 23:59:59
+        
                 $query->whereBetween('updated_at', [$startDateTime, $endDateTime]);
                 $isFiltered = true; // Tandai bahwa data difilter
             } catch (\Exception $e) {
-                return response()->json(['error' => 'Format tanggal atau waktu tidak valid'], 400);
+                return response()->json(['error' => 'Format rentang tanggal tidak valid'], 400);
             }
         }
     
@@ -181,33 +181,37 @@ class DetailDashboardController extends Controller
             return response()->json(['error' => 'Alat tidak ditemukan'], 404);
         }
     
-        // Ambil query parameter date dan time
-        $date = request('date');
-        $time = request('time');
+        // Ambil query parameter untuk rentang tanggal
+        $dateStart = request('dateS');
+        $dateEnd = request('dateE');
     
         $query = Dht::where('id_alat', $alat->id_alat);
     
         // Flag untuk mengetahui apakah ada filter
         $isFiltered = false;
     
-        // Jika ada filter date dan time, tambahkan kondisi untuk filter
-        if ($date && $time) {
+        // Jika ada filter rentang tanggal, tambahkan kondisi untuk filter
+        if ($dateStart && $dateEnd) {
             try {
-                $startDateTime = Carbon::parse("$date $time");
-                $endDateTime = $startDateTime->copy()->endOfDay();
+                $startDateTime = Carbon::parse($dateStart)->startOfDay(); // 00:00:00
+                $endDateTime = Carbon::parse($dateEnd)->endOfDay(); // 23:59:59
     
                 $query->whereBetween('updated_at', [$startDateTime, $endDateTime]);
                 $isFiltered = true; // Tandai bahwa data difilter
             } catch (\Exception $e) {
-                return response()->json(['error' => 'Format tanggal atau waktu tidak valid'], 400);
+                return response()->json(['error' => 'Format rentang tanggal tidak valid'], 400);
             }
         }
     
         // Tentukan urutan data berdasarkan filter
         $orderDirection = $isFiltered ? 'asc' : 'desc';
     
-        // Ambil data dengan urutan sesuai filter dan limit 60
-        $query->orderBy('updated_at', $orderDirection)->limit(60);
+        // Ambil data dengan urutan sesuai filter dan limit 60 jika tanpa filter
+        if (!$isFiltered) {
+            $query->orderBy('updated_at', $orderDirection)->limit(60);
+        } else {
+            $query->orderBy('updated_at', $orderDirection);
+        }
     
         $data = $query->get(['kelembaban', 'updated_at']);
     
@@ -233,7 +237,7 @@ class DetailDashboardController extends Controller
         }
     
         return response()->json($formattedData);
-    }    
+    }
 
     public function exportData(Request $request, $uuid)
     {
