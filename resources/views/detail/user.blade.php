@@ -237,6 +237,28 @@
         var myLineChart, myHumiChart;
 
         function showChart() {
+            let chartInterval = null;
+            let humiChartInterval = null;
+
+            function startIntervals() {
+                stopIntervals(); // Pastikan interval sebelumnya dihentikan
+
+                chartInterval = setInterval(() => fetchAndUpdateChart(), 5000);
+                humiChartInterval = setInterval(() => fetchAndUpdateHumiChart(), 5000);
+                console.log("reloaded");
+            }
+
+            function stopIntervals() {
+                if (chartInterval) {
+                    clearInterval(chartInterval);
+                    chartInterval = null;
+                }
+                if (humiChartInterval) {
+                    clearInterval(humiChartInterval);
+                    humiChartInterval = null;
+                }
+            }
+
             Chart.defaults.global.defaultFontFamily =
                 "Nunito, '-apple-system', system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif";
             Chart.defaults.global.defaultFontColor = "#858796";
@@ -491,8 +513,7 @@
             // Fetch data and initialize charts
             fetchAndUpdateChart();
             fetchAndUpdateHumiChart();
-            // setInterval(fetchAndUpdateChart, 5000);
-            // setInterval(fetchAndUpdateHumiChart, 5000);
+            startIntervals();
 
             document.getElementById('filterData').addEventListener('click', function() {
                 const selectedDate = document.getElementById('selectedDate').value;
@@ -502,6 +523,8 @@
                     alert('Pilih tanggal dan waktu terlebih dahulu!');
                     return;
                 }
+
+                stopIntervals();
 
                 fetchAndUpdateChart(selectedDate, selectedTime);
                 fetchAndUpdateHumiChart(selectedDate, selectedTime);
